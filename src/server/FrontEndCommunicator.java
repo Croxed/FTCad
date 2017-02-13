@@ -29,11 +29,14 @@ public class FrontEndCommunicator extends Thread {
 	public void run() {
 		while (true) {
 			try {
+				System.out.println("Trying to send server request message");
 				socket = new Socket(java.net.InetAddress.getByName(hostName), hostPort);
 				input = new ObjectInputStream(socket.getInputStream());
 				output = new ObjectOutputStream(socket.getOutputStream());
 				
+			
 				output.writeObject(new ServerRequestMessage(hostPort));
+				System.out.println("Sent server request message");
 				
 				listenToFrontEnd();
 			} catch (IOException e) {
@@ -49,7 +52,7 @@ public class FrontEndCommunicator extends Thread {
 				Object obj = input.readObject();
 				
 				if (obj instanceof ServerRespondMessage) {
-					System.out.println("Frontend responded");
+					System.out.println("Frontend responded with a ServerRespondMessage");
 				} else {
 					System.out.println("Can't parse message");
 				}

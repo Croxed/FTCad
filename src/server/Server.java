@@ -53,11 +53,10 @@ public class Server {
 			fec = new FrontEndCommunicator(this, hostName, hostPort);
 			fec.start();
 			// Wait for response from frontend before starting server
-			boolean started = false;
-			while (!started) {
+			while (true) {
 				if (fec.getType() != null) {
-					started = true;
 					listenForConnections();
+					return;
 				}
 			}
 	}
