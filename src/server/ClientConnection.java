@@ -6,7 +6,7 @@ import java.net.*;
 import common.*;
 
 public class ClientConnection extends Thread {
-	private final Server server;
+	//private final Server server;
 	private final Socket socket;
 	
 	private final ObjectInputStream input; 
@@ -16,8 +16,8 @@ public class ClientConnection extends Thread {
 	 * Creates a new client connection
 	 * @throws IOException if input and output streams can't be created
 	 */
-	public ClientConnection(Server _server, Socket _socket) throws IOException {
-		server = _server;
+	public ClientConnection(Socket _socket) throws IOException {
+		//server = _server;
 		socket = _socket;
 		
 		input = new ObjectInputStream(socket.getInputStream());
