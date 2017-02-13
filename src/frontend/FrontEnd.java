@@ -16,8 +16,6 @@ import java.util.Vector;
 public class FrontEnd {
     private ServerSocket m_serverSocket;
     private Socket m_socket;
-    private volatile Vector<Thread> m_serverConnections = new Vector<>();
-    private volatile Vector<ClientConnection> m_clientConnections = new Vector<>();
 
     public FrontEnd(int portNumber) throws IOException {
         m_serverSocket = new ServerSocket(portNumber);
@@ -42,21 +40,14 @@ public class FrontEnd {
 
     private void listenForMessages() {
         System.out.println("Listening for messages");
+        Connection connection = new Connection();
+        Thread connectionThread = new Thread(connection);
+        connectionThread.start();
         while (true) {
             try {
                 m_socket = m_serverSocket.accept();
-                ObjectOutputStream outputStream = new ObjectOutputStream(m_socket.getOutputStream());
-                ObjectInputStream inputStream = new ObjectInputStream(m_socket.getInputStream());
-                Object input = inputStream.readObject();
-                if (input instanceof ServerRequestMessage) {
-                    ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream);
-                    Thread serverThread = new Thread(serverConnection);
-                    serverThread.start();
-                    m_serverConnections.add(serverThread);
-                } else if (input instanceof ClientRequestMessage) {
-                    m_clientConnections.add(new ClientConnection(m_socket, outputStream, inputStream));
-                }
-            } catch (IOException | ClassNotFoundException e) {
+                connection.setNewSocket(m_socket);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
