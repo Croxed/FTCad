@@ -35,7 +35,7 @@ public class FrontEndCommunicator extends Thread {
 				output = new ObjectOutputStream(socket.getOutputStream());
 				
 			
-				output.writeObject(new ServerRequestMessage(hostPort));
+				output.writeObject(new ServerWithFrontEndConnectionRequestMessage(hostPort));
 				System.out.println("Sent server request message");
 				
 				listenToFrontEnd();
@@ -51,8 +51,8 @@ public class FrontEndCommunicator extends Thread {
 			try {
 				Object obj = input.readObject();
 				
-				if (obj instanceof ServerRespondMessage) {
-					System.out.println("Frontend responded with a ServerRespondMessage");
+				if (obj instanceof ServerWithFrontEndConnectionRespondMessage) {
+					System.out.println("Frontend responded with a ServerWithFrontEndConnectionRespondMessage");
 				} else {
 					System.out.println("Can't parse message");
 				}

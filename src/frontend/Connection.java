@@ -1,7 +1,7 @@
 package frontend;
 
-import common.ClientRequestMessage;
-import common.ServerRequestMessage;
+import common.ClientWithFrontEndConnectionRequestMessage;
+import common.ServerWithFrontEndConnectionRequestMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,13 +31,13 @@ public class Connection implements Runnable {
                 ObjectOutputStream outputStream = new ObjectOutputStream(m_socket.getOutputStream());
                 ObjectInputStream inputStream = new ObjectInputStream(m_socket.getInputStream());
                 Object input = inputStream.readObject();
-                if (input instanceof ServerRequestMessage) {
+                if (input instanceof ServerWithFrontEndConnectionRequestMessage) {
                     ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream);
                     System.out.println("A server connected!");
                     Thread serverThread = new Thread(serverConnection);
                     serverThread.start();
                     m_connectedServers.add(serverThread);
-                } else if (input instanceof ClientRequestMessage) {
+                } else if (input instanceof ClientWithFrontEndConnectionRequestMessage) {
                     System.out.println("A client connected!");
                 }
             } catch (IOException | ClassNotFoundException e) {

@@ -92,13 +92,13 @@ public class ServerConnection implements Runnable {
 	private void getAddressFromFrontEnd() {
 		Object response = null;
 		try {
-			mOStream.writeObject(new ClientRequestMessage());
+			mOStream.writeObject(new ClientWithFrontEndConnectionRequestMessage());
 			response = mIStream.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-		if(response instanceof ServerRespondMessage) {
+		if(response instanceof ServerWithFrontEndConnectionRespondMessage) {
 			// Set the address to the primary server
 			// mServerAddress = ?
 			// mServerPort = ?

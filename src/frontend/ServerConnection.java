@@ -1,7 +1,7 @@
 package frontend;
 
 import common.PingMessage;
-import common.ServerRespondMessage;
+import common.ServerWithFrontEndConnectionRespondMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,8 +23,8 @@ public class ServerConnection implements Runnable {
         inputStream = iStream;
         isConnected = true;
         try {
-            System.out.println("Trying to send ServerRespondMessage");
-            outputStream.writeObject(new ServerRespondMessage());
+            System.out.println("Trying to send ServerWithFrontEndConnectionRespondMessage");
+            outputStream.writeObject(new ServerWithFrontEndConnectionRespondMessage());
         } catch (IOException e) {
             e.printStackTrace();
         }
