@@ -24,7 +24,8 @@ public class ServerConnection implements Runnable {
         isConnected = true;
         try {
             System.out.println("Trying to send ServerWithFrontEndConnectionRespondMessage");
-            outputStream.writeObject(new ServerWithFrontEndConnectionRespondMessage());
+            // TODO: always tells servers they are primary
+            outputStream.writeObject(new ServerWithFrontEndConnectionRespondMessage(true));
         } catch (IOException e) {
             e.printStackTrace();
         }
