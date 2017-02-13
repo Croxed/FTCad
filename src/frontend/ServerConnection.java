@@ -36,11 +36,11 @@ public class ServerConnection implements Runnable {
         return isConnected;
     }
 
-    public InetAddress getAddress(){
-        return m_socket != null ? m_socket.getInetAddress(): null;
+    public InetAddress getAddress() {
+        return m_socket != null ? m_socket.getInetAddress() : null;
     }
 
-    public int getPort(){
+    public int getPort() {
         return m_socket != null ? m_socket.getPort() : 0;
     }
 
@@ -59,12 +59,15 @@ public class ServerConnection implements Runnable {
             } catch (IOException | ClassNotFoundException e) {
                 if (m_time == 0)
                     m_time = System.currentTimeMillis();
-
-                e.printStackTrace();
             }
             if (m_time != 0 && System.currentTimeMillis() - m_time > 5000) {
                 isConnected = false;
             }
+        }
+        try{
+            m_socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
