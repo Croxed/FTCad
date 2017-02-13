@@ -47,39 +47,39 @@ public class GUI extends JFrame implements
         setSize(xpos,ypos);
     	setTitle("FTCAD");
 
-	Container pane = getContentPane();
-	pane.setBackground(Color.BLACK);
-
-	pane.add(ovalButton);
-	pane.add(rectangleButton);
-	pane.add(lineButton);
-	pane.add(filledOvalButton);
-	pane.add(filledRectangleButton);
-	pane.add(redButton);
-	pane.add(blueButton);
-	pane.add(greenButton);
-	pane.add(whiteButton);
-	pane.add(pinkButton);
-
-	pane.setLayout(new FlowLayout());
-	setVisible(true);
+		Container pane = getContentPane();
+		pane.setBackground(Color.BLACK);
+	
+		pane.add(ovalButton);
+		pane.add(rectangleButton);
+		pane.add(lineButton);
+		pane.add(filledOvalButton);
+		pane.add(filledRectangleButton);
+		pane.add(redButton);
+		pane.add(blueButton);
+		pane.add(greenButton);
+		pane.add(whiteButton);
+		pane.add(pinkButton);
+	
+		pane.setLayout(new FlowLayout());
+		setVisible(true);
     }
 
     public void addToListener(){
-	addWindowListener(this);
-	addMouseListener(this);
-	addMouseMotionListener(this);
+		addWindowListener(this);
+		addMouseListener(this);
+		addMouseMotionListener(this);
 
         ovalButton.addActionListener(this);
-	rectangleButton.addActionListener(this);
-	lineButton.addActionListener(this);
-	filledOvalButton.addActionListener(this);
-	filledRectangleButton.addActionListener(this);
-	redButton.addActionListener(this);
-	blueButton.addActionListener(this);
-	greenButton.addActionListener(this);
-	whiteButton.addActionListener(this);
-	pinkButton.addActionListener(this);
+		rectangleButton.addActionListener(this);
+		lineButton.addActionListener(this);
+		filledOvalButton.addActionListener(this);
+		filledRectangleButton.addActionListener(this);
+		redButton.addActionListener(this);
+		blueButton.addActionListener(this);
+		greenButton.addActionListener(this);
+		whiteButton.addActionListener(this);
+		pinkButton.addActionListener(this);
 
     }
 
@@ -97,13 +97,13 @@ public class GUI extends JFrame implements
     public void mouseExited(MouseEvent e) {}
 
     public void mousePressed(MouseEvent e) {
-	if(e.getButton() == MouseEvent.BUTTON1) {
-	    if(e.getX() > 0 && e.getY() > 91) {
-		current = new GObject(template.getShape(), template.getColor(), e.getX(), e.getY(), 0, 0);
-	    }
-	    else current = null;
-	}
-	repaint();
+		if(e.getButton() == MouseEvent.BUTTON1) {
+		    if(e.getX() > 0 && e.getY() > 91) {
+			current = new GObject(template.getShape(), template.getColor(), e.getX(), e.getY(), 0, 0);
+		    }
+		    else current = null;
+		}
+		repaint();
     }
 
     public void mouseClicked(MouseEvent e) {

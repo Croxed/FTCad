@@ -9,7 +9,7 @@ final class Shape {
     private String type;
 
     private Shape(String type) {
-	this.type = type;
+    	this.type = type;
     }
 
     @Override
@@ -20,4 +20,5 @@ final class Shape {
     public static Shape LINE = new Shape("LINE");
     public static Shape FILLED_RECTANGLE = new Shape("FILLED_RECTANGLE");
     public static Shape FILLED_OVAL = new Shape("FILLED_OVAL");
+    
 }
