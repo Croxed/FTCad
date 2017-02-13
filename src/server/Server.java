@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import common.*;
 
 public class Server {
+	public enum Type {
+		PRIMARY, BACKUP
+	}
+	
 	private ArrayList<ClientConnection> clients = new ArrayList<ClientConnection>(); // Keep a list of the clients
 	
 	private FrontEndCommunicator fec;
