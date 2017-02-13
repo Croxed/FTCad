@@ -12,11 +12,20 @@ public class Cad {
     
     public static void main(String[] args) {
         gui.addToListener();
-        new Cad();
+        new Cad(args);
     }
     
-    private Cad() {
-    	mConnection = new ServerConnection("localhost", 1325);
-    	new Thread(mConnection).start();
+    /**
+     * Creates connection to the server.
+     * @param args
+     */
+    private Cad(String[] args) {
+    	if(args.length < 1){
+    		mConnection = new ServerConnection(args[0], Integer.parseInt(args[1]));
+        	new Thread(mConnection).start();
+    	} else {
+    		System.err.println("Need arguments <Frontend address> <Frontend port>");
+    		System.exit(-1);
+    	}
     }
 }

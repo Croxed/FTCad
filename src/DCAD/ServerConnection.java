@@ -40,13 +40,13 @@ public class ServerConnection implements Runnable {
 	@Override
 	public void run() {
 		
-		System.out.println("Attempting to connect to Front end");
+		System.out.println("Attempting to connect to Frontend");
 		connectToFrontEnd();
 		
 		System.out.println("Getting address information for main server");
 		getAddressFromFrontEnd();
 		
-		System.out.println("Disconnecting from Front end");
+		System.out.println("Disconnecting from Frontend");
 		disconnectSocket();
 		
 		System.out.println("Connecting to server");
@@ -71,6 +71,7 @@ public class ServerConnection implements Runnable {
 			mSocket = new Socket(mServerAddress, mServerPort);
 			mOStream = new ObjectOutputStream(mSocket.getOutputStream());
 			mIStream = new ObjectInputStream(mSocket.getInputStream());
+			isConnected = true;
 		} catch (IOException e) { e.printStackTrace(); }
 	}
 
