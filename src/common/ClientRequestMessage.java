@@ -5,6 +5,6 @@ package common;
  */
 public class ClientRequestMessage extends Message {
     public ClientRequestMessage(){
-
+    	
     }
 }
