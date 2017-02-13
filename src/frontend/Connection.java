@@ -7,6 +7,7 @@ import common.ServerWithFrontEndConnectionRequestMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Vector;
 
@@ -41,7 +42,7 @@ public class Connection implements Runnable {
                 } else if (input instanceof ClientWithFrontEndConnectionRequestMessage) {
                     if(m_connectedServers.size() > 1) {
                         ServerConnection serverConnection = m_connectedServers.lastElement();
-                        String address = serverConnection.getAddress();
+                        InetAddress address = serverConnection.getAddress();
                         int port = serverConnection.getPort();
                         outputStream.writeObject(new ClientWithFrontEndConnectionRespondMessage(address, port));
                     }
