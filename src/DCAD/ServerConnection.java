@@ -102,7 +102,7 @@ public class ServerConnection implements Runnable {
 			ClientWithFrontEndConnectionRespondMessage msg = (ClientWithFrontEndConnectionRespondMessage)response;
 			// Set the address to the primary server
 			try {
-				mServerAddress = InetAddress.getByName(msg.getAddress());
+				mServerAddress = msg.getAddress();
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			}
