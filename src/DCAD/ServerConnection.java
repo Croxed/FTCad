@@ -98,10 +98,15 @@ public class ServerConnection implements Runnable {
 			e.printStackTrace();
 		}
 		
-		if(response instanceof ServerWithFrontEndConnectionRespondMessage) {
+		if(response instanceof ClientWithFrontEndConnectionRespondMessage) {
+			ClientWithFrontEndConnectionRespondMessage msg = (ClientWithFrontEndConnectionRespondMessage)response;
 			// Set the address to the primary server
-			// mServerAddress = ?
-			// mServerPort = ?
+			try {
+				mServerAddress = InetAddress.getByName(msg.getAddress());
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+			mServerPort = msg.getPort();
 		} else {
 			// Got some unknown shit from the server probably.
 		}
