@@ -10,12 +10,12 @@ import java.net.Socket;
 /**
  * Created by oscar on 2017-02-13.
  */
-public class ServerConnection {
+public class ClientConnection {
     private Socket m_socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
-    public ServerConnection(Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream) {
+    public ClientConnection(Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream) {
         m_socket = socket;
         outputStream = oStream;
         inputStream = iStream;
