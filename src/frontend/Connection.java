@@ -33,11 +33,12 @@ public class Connection implements Runnable {
                 Object input = inputStream.readObject();
                 if (input instanceof ServerRequestMessage) {
                     ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream);
+                    System.out.println("A server connected!");
                     Thread serverThread = new Thread(serverConnection);
                     serverThread.start();
                     m_connectedServers.add(serverThread);
                 } else if (input instanceof ClientRequestMessage) {
-
+                    System.out.println("A client connected!");
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

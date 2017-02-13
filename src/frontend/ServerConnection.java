@@ -23,6 +23,7 @@ public class ServerConnection implements Runnable {
         inputStream = iStream;
         isConnected = true;
         try {
+            System.out.println("Trying to send ServerRespondMessage");
             outputStream.writeObject(new ServerRespondMessage());
         } catch (IOException e) {
             e.printStackTrace();
