@@ -51,7 +51,7 @@ public class ServerConnection implements Runnable {
 
                 e.printStackTrace();
             }
-            if (System.currentTimeMillis() - m_time > 5000) {
+            if (m_time != 0 && System.currentTimeMillis() - m_time > 5000) {
                 isConnected = false;
             }
         }
