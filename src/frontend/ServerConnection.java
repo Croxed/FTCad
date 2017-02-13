@@ -35,6 +35,14 @@ public class ServerConnection implements Runnable {
         return isConnected;
     }
 
+    public String getAddress(){
+        return m_socket != null ? m_socket.getInetAddress().toString() : null;
+    }
+
+    public int getPort(){
+        return m_socket != null ? m_socket.getPort() : 0;
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     public void run() {

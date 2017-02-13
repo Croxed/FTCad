@@ -1,6 +1,7 @@
 package frontend;
 
 import common.ClientWithFrontEndConnectionRequestMessage;
+import common.ClientWithFrontEndConnectionRespondMessage;
 import common.ServerWithFrontEndConnectionRequestMessage;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.Vector;
 public class Connection implements Runnable {
     private volatile Socket m_socket;
     private volatile Socket m_newSocket;
-    private volatile Vector<Thread> m_connectedServers = new Vector<>();
+    private volatile Vector<ServerConnection> m_connectedServers = new Vector<>();
 
     public Connection() {
     }
@@ -36,9 +37,17 @@ public class Connection implements Runnable {
                     System.out.println("A server connected!");
                     Thread serverThread = new Thread(serverConnection);
                     serverThread.start();
-                    m_connectedServers.add(serverThread);
+                    m_connectedServers.add(serverConnection);
                 } else if (input instanceof ClientWithFrontEndConnectionRequestMessage) {
-                    System.out.println("A client connected!");
+                    if(m_connectedServers.size() > 1) {
+                        ServerConnection serverConnection = m_connectedServers.lastElement();
+                        String address = serverConnection.getAddress();
+                        int port = serverConnection.getPort();
+                        outputStream.writeObject(new ClientWithFrontEndConnectionRespondMessage(address, port));
+                    }
+                    else{
+                        outputStream.writeObject(new ClientWithFrontEndConnectionRespondMessage(null, 0));
+                    }
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
