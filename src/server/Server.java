@@ -4,12 +4,16 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
+import common.*;
+
 public class Server {
 	private ArrayList<ClientConnection> clients = new ArrayList<ClientConnection>(); // Keep a list of the clients
 	
-	private ServerListener sl;
+	private FrontEndCommunicator fec;
 	
 	private int port;
+	
+	private ServerSocket socket;
 
 
 	/**
@@ -44,13 +48,41 @@ public class Server {
 	}
 
 
-	private void talkWithFrontend(String s, int sport) {
-		// ask frontend first
-		try {
-			sl = new ServerListener(port);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private void talkWithFrontend(String hostName, int hostPort) throws IOException {
+
+			fec = new FrontEndCommunicator(this, hostName, hostPort);
+			fec.start();
+			// Wait for response from frontend before starting server
+			boolean started = false;
+			while (!started) {
+				if (fec.getType() != null) {
+					started = true;
+					listenForConnections();
+				}
+			}
+	}
+
+	/**
+	 * Listen for new connections, starting a new ClientConnection for each
+	 * @throws IOException 
+	 */
+	public void listenForConnections() throws IOException {
+		socket = new ServerSocket(port);
+		System.out.println("Waiting for client messages... ");
+		
+		// Keep listening
+		while (true) {
+			Socket client;
+			try {
+				// Wait for new connections and accept
+				client = socket.accept();
+				// Create a new ClientConnection thread for the new socket and start the thread
+				ClientConnection cc = new ClientConnection(client);
+				cc.start();
+			} catch (IOException e) {
+				System.out.println("Error when accepting connection");
+				e.printStackTrace();
+			}
 		}
 	}
 }
