@@ -6,6 +6,7 @@ import common.ServerWithFrontEndConnectionRespondMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 /**
@@ -35,8 +36,8 @@ public class ServerConnection implements Runnable {
         return isConnected;
     }
 
-    public String getAddress(){
-        return m_socket != null ? m_socket.getInetAddress().toString() : null;
+    public InetAddress getAddress(){
+        return m_socket != null ? m_socket.getInetAddress(): null;
     }
 
     public int getPort(){
