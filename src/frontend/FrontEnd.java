@@ -1,6 +1,6 @@
 package frontend;
 
-import common.Message;
+import common.ClientRequestMessage;
 import common.ServerRequestMessage;
 
 import java.io.IOException;
@@ -16,7 +16,8 @@ import java.util.Vector;
 public class FrontEnd {
     private ServerSocket m_serverSocket;
     private Socket m_socket;
-    private volatile Vector<ServerConnection> m_serverConnections = new Vector<>();
+    private volatile Vector<Thread> m_serverConnections = new Vector<>();
+    private volatile Vector<ClientConnection> m_clientConnections = new Vector<>();
 
     public FrontEnd(int portNumber) throws IOException {
         m_serverSocket = new ServerSocket(portNumber);
@@ -48,9 +49,12 @@ public class FrontEnd {
                 ObjectInputStream inputStream = new ObjectInputStream(m_socket.getInputStream());
                 Object input = inputStream.readObject();
                 if (input instanceof ServerRequestMessage) {
-                    m_serverConnections.add(new ServerConnection(m_socket, outputStream, inputStream));
-                } else if (input instanceof Message) {
-
+                    ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream);
+                    Thread serverThread = new Thread(serverConnection);
+                    serverThread.start();
+                    m_serverConnections.add(serverThread);
+                } else if (input instanceof ClientRequestMessage) {
+                    m_clientConnections.add(new ClientConnection(m_socket, outputStream, inputStream));
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
