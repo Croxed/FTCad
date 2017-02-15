@@ -1,7 +1,5 @@
 package frontend;
 
-import common.ClientWithFrontEnd.ConnectionRespondMessage;
-import common.ServerWithFrontEnd.ConnectionRequestMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,21 +30,21 @@ public class Connection implements Runnable {
                 ObjectOutputStream outputStream = new ObjectOutputStream(m_socket.getOutputStream());
                 ObjectInputStream inputStream = new ObjectInputStream(m_socket.getInputStream());
                 Object input = inputStream.readObject();
-                if (input instanceof ConnectionRequestMessage) {
+                if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
                     ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream);
                     System.out.println("A server connected!");
                     Thread serverThread = new Thread(serverConnection);
                     serverThread.start();
                     m_connectedServers.add(serverConnection);
                 } else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
-                    if(m_connectedServers.size() > 1) {
+                    if(m_connectedServers.size() >= 1) {
                         ServerConnection serverConnection = m_connectedServers.lastElement();
                         InetAddress address = serverConnection.getAddress();
                         int port = serverConnection.getPort();
-                        outputStream.writeObject(new ConnectionRespondMessage(address, port));
+                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
                     }
                     else{
-                        outputStream.writeObject(new ConnectionRespondMessage(null, 0));
+                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {
