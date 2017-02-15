@@ -67,13 +67,16 @@ public class ServerConnection implements Runnable {
 	}
 
 	private void listenForServerActions() {
-		Object input;
-		try {
-			input = mIStream.readObject();
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
+		System.out.println("Listening for server actions");
+		while(true) {
+			Object input;
+			try {
+				input = mIStream.readObject();
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+			// Handle the input and put to / update the GUI.
 		}
-		// Handle the input and put in GUI.
 	}
 
 	/**
@@ -116,6 +119,8 @@ public class ServerConnection implements Runnable {
 			// Set the address to the primary server
 			mServerAddress = msg.getAddress();
 			mServerPort = msg.getPort();
+			
+			System.out.println("From frontend: ServerAddress: " + mServerAddress + " serverport: " + mServerPort);
 		} else {
 			// Got some unknown shit from the server probably.
 		}
