@@ -34,7 +34,7 @@ public class FrontEnd {
 
     private void listenForMessages() {
         System.out.println("Listening for messages");
-        Connection connection = new Connection();
+        Connection connection = new Connection(this);
         Thread connectionThread = new Thread(connection);
         connectionThread.start();
         while (true) {

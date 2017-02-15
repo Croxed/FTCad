@@ -14,9 +14,11 @@ import java.util.Vector;
 public class Connection implements Runnable {
     private volatile Socket m_socket;
     private volatile Socket m_newSocket;
+    private volatile FrontEnd m_frontEnd;
     private volatile Vector<ServerConnection> m_connectedServers = new Vector<>();
 
-    public Connection() {
+    public Connection(FrontEnd frontEnd) {
+        m_frontEnd = frontEnd;
     }
 
     @SuppressWarnings("Duplicates")
@@ -32,7 +34,7 @@ public class Connection implements Runnable {
                 Object input = inputStream.readObject();
                 if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
                     common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
-                    ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream, msg.getPortNr());
+                    ServerConnection serverConnection = new ServerConnection(m_frontEnd, m_socket, outputStream, inputStream, msg.getPortNr());
                     System.out.println("A server connected!");
                     Thread serverThread = new Thread(serverConnection);
                     serverThread.start();

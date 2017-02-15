@@ -18,8 +18,10 @@ public class ServerConnection implements Runnable {
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private volatile boolean isConnected;
+    private FrontEnd m_fronEnd;
 
-    public ServerConnection(Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream, int portnr) {
+    public ServerConnection(FrontEnd frontEnd, Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream, int portnr) {
+        m_fronEnd = frontEnd;
         m_portNr = portnr;
         m_socket = socket;
         outputStream = oStream;
@@ -49,27 +51,39 @@ public class ServerConnection implements Runnable {
     @SuppressWarnings("Duplicates")
     @Override
     public void run() {
-        long m_time = 0;
+        Thread pingThread = new Thread(new Pinger());
+        pingThread.start();
         while (isConnected) {
             Object input;
             try {
+                m_socket.setSoTimeout(5000);
                 input = inputStream.readObject();
-                m_time = 0;
-                if (input instanceof PingMessage) {
-
-                }
             } catch (IOException | ClassNotFoundException e) {
-                if (m_time == 0)
-                    m_time = System.currentTimeMillis();
-            }
-            if (m_time != 0 && System.currentTimeMillis() - m_time > 5000) {
                 isConnected = false;
             }
         }
         try{
+            pingThread.interrupt();
+            pingThread.join();
             m_socket.close();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private class Pinger implements Runnable{
+        @Override
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    outputStream.writeObject(new PingMessage());
+                    Thread.sleep(1000);
+                } catch (IOException e) {
+                    System.err.println("Could not ping");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
