@@ -43,7 +43,7 @@ public class Connection implements Runnable {
                         System.out.println("A client connected!");
                         InetAddress address = serverConnection.getAddress();
                         int port = serverConnection.getPort();
-                        System.out.println(address.toString() + port);
+                        System.out.println(address.toString() + ":" + port);
                         outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
                     }
                     else{
@@ -51,7 +51,12 @@ public class Connection implements Runnable {
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+                try {
+                    Thread.sleep(1000);
+                    System.err.println("Could not receive message");
+                } catch (InterruptedException e1) {
+                    System.err.println("Could not sleep");
+                }
             }
         }
     }
