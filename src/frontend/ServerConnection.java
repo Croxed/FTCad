@@ -14,11 +14,13 @@ import java.net.Socket;
  */
 public class ServerConnection implements Runnable {
     private Socket m_socket;
+    private int m_portNr;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private volatile boolean isConnected;
 
-    public ServerConnection(Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream) {
+    public ServerConnection(Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream, int portnr) {
+        m_portNr = portnr;
         m_socket = socket;
         outputStream = oStream;
         inputStream = iStream;
@@ -41,7 +43,7 @@ public class ServerConnection implements Runnable {
     }
 
     public int getPort() {
-        return m_socket != null ? m_socket.getPort() : 0;
+        return m_portNr;
     }
 
     @SuppressWarnings("Duplicates")

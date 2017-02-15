@@ -11,4 +11,8 @@ public class ConnectionRequestMessage extends Message {
     public ConnectionRequestMessage(int serverPort){
         portNr = serverPort;
     }
+
+    public int getPortNr() {
+        return portNr;
+    }
 }

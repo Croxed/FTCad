@@ -31,7 +31,8 @@ public class Connection implements Runnable {
                 ObjectInputStream inputStream = new ObjectInputStream(m_socket.getInputStream());
                 Object input = inputStream.readObject();
                 if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
-                    ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream);
+                    common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
+                    ServerConnection serverConnection = new ServerConnection(m_socket, outputStream, inputStream, msg.getPortNr());
                     System.out.println("A server connected!");
                     Thread serverThread = new Thread(serverConnection);
                     serverThread.start();
@@ -42,6 +43,7 @@ public class Connection implements Runnable {
                         System.out.println("A client connected!");
                         InetAddress address = serverConnection.getAddress();
                         int port = serverConnection.getPort();
+                        System.out.println(address.toString() + port);
                         outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
                     }
                     else{
