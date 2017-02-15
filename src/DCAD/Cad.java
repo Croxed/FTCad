@@ -20,7 +20,7 @@ public class Cad {
      * @param args
      */
     private Cad(String[] args) {
-    	if(args.length < 1){
+    	if(args.length > 1){
     		mConnection = new ServerConnection(args[0], Integer.parseInt(args[1]));
         	new Thread(mConnection).start();
     	} else {
