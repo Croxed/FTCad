@@ -44,7 +44,7 @@ public class ServerConnection implements Runnable {
 		System.out.println("Attempting to connect to Frontend");
 		connectToFrontEnd();
 		
-		System.out.println("Getting address information for main server");
+		System.out.println("Getting address information to the main server");
 		getAddressFromFrontEnd();
 		
 		System.out.println("Disconnecting from Frontend");
@@ -54,7 +54,9 @@ public class ServerConnection implements Runnable {
 		connectToServer();
 		
 		while(isConnected) {
-			// Handle server actions and stuff, like updating the GUI with other players actions. 
+			// While the client is connected to the server
+			// Supply the clients actions to the server and listen for actions created from the server
+			listenForServerActions();
 		}
 		
 		System.out.println("Disconnects from the server");
@@ -62,6 +64,16 @@ public class ServerConnection implements Runnable {
 		
 		// Maybe want to connect to the front end again or something.
 		//  
+	}
+
+	private void listenForServerActions() {
+		Object input;
+		try {
+			input = mIStream.readObject();
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
+		// Handle the input and put in GUI.
 	}
 
 	/**
@@ -117,6 +129,7 @@ public class ServerConnection implements Runnable {
 			mOStream.close();
 			mIStream.close();
 			mSocket.close();
+			isConnected = false;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
