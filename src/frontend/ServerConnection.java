@@ -60,6 +60,8 @@ public class ServerConnection implements Runnable {
             try {
                 m_socket.setSoTimeout(5000);
                 input = inputStream.readObject();
+                if(input instanceof PingMessage)
+                    System.out.print(".");
             } catch (IOException | ClassNotFoundException e) {
                 isConnected = false;
             }
@@ -75,12 +77,14 @@ public class ServerConnection implements Runnable {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     private class Pinger implements Runnable{
         @Override
         public void run() {
             while (isConnected) {
                 try {
                     outputStream.writeObject(new PingMessage());
+                    System.out.print("!");
                 } catch (IOException e) {
                     System.err.println("Could not ping");
                 }
