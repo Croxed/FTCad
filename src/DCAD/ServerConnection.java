@@ -58,7 +58,11 @@ public class ServerConnection implements Runnable {
 		}
 		
 		System.out.println("Disconnects from the server");
-		disconnectSocket();
+		try {
+			disconnectSocket();
+		} catch (IOException e) {
+			System.err.println("Could not disconnect from the server");
+		}
 		
 		// Maybe want to connect to the front end again or something.
 		//  
@@ -75,7 +79,7 @@ public class ServerConnection implements Runnable {
 		// Keep the number of attempts 
 		int attempts = 0;
 		
-		// 
+		// Try and connect to the frontend   
 		do {
 			System.out.println("Attempting to connect to Frontend");
 			try {
@@ -84,38 +88,42 @@ public class ServerConnection implements Runnable {
 			} catch (IOException e) {
 				isConnectedToFrontEnd = false;
 			}
-			// Take a nap so it does not "spam connect"
+			
+			// Take a nap after each failed attempt 
 			if(!isConnectedToFrontEnd) {
 				try {
 					Thread.sleep(1000);
-				} catch (InterruptedException e) { e.printStackTrace(); }
+				} catch (InterruptedException e) {}
 			}
 		} while(!isConnectedToFrontEnd && attempts++ < 10);
 		
+		// If is connected to the front end, proceed with getting the connection details to the primary server and connect to it
 		if(isConnectedToFrontEnd) {
 			System.out.println("Getting address information to the main server");
 			getAddressFromFrontEnd();
 			
 			System.out.println("Disconnecting from Frontend");
-			disconnectSocket();
-			
-			System.out.println("Connecting to server");
 			try {
-				connectToServer();
+				disconnectSocket();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("Could not disconnect from the Frontend");
 			}
 			
+			System.out.println("Connecting to primary server");
+			try {
+				connectToPrimaryServer();
+			} catch (IOException e) {
+				System.err.println("Could not connect to the primary server");
+			}
+			// If it didn't even connect to the front end, we will end up here 
 		} else {
 			System.out.println("Failed to connect to the Frontend. Don't use this program any more pls");
 		}
-		
-		
+
 	}
 
 	/**
 	 * Listens to the actions received from the server.
-	 * Possibly a loopception here o_O. 
 	 */
 	private void listenForServerActions() {
 		System.out.println("Listening for server actions");
@@ -129,7 +137,11 @@ public class ServerConnection implements Runnable {
 				mIsListening = false;
 				e.printStackTrace();
 			}
+			
 			// Handle the input and put to / update the GUI.
+//			if(input instanceof xx) {
+//				// Convert to correct object etc
+//			}
 		}
 	}
 
@@ -137,7 +149,7 @@ public class ServerConnection implements Runnable {
 	 * Connects to the primary server. The address should be obtained from the front end.
 	 * @throws IOException 
 	 */
-	private void connectToServer() throws IOException {
+	private void connectToPrimaryServer() throws IOException {
 		mSocket = new Socket(mServerAddress, mServerPort);
 		mOStream = new ObjectOutputStream(mSocket.getOutputStream());
 		mIStream = new ObjectInputStream(mSocket.getInputStream());
@@ -180,16 +192,13 @@ public class ServerConnection implements Runnable {
 
 	/**
 	 * Disconnects from the Front end.
+	 * @throws IOException
 	 */
-	private void disconnectSocket() {
-		try {
-			mOStream.close();
-			mIStream.close();
-			mSocket.close();
-			mIsConnected = false;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private void disconnectSocket() throws IOException {
+		mOStream.close();
+		mIStream.close();
+		mSocket.close();
+		mIsConnected = false;
 	}
 
 }
