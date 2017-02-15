@@ -14,7 +14,7 @@ public class FrontEndCommunicator extends Thread {
 	private final String hostName;
 	private final int hostPort;
 	
-	private Boolean type;
+	private Boolean primary;
 
 	public FrontEndCommunicator(Server _server, String _hostName, int _hostPort) {
 		server = _server;
@@ -36,7 +36,7 @@ public class FrontEndCommunicator extends Thread {
 				output = new ObjectOutputStream(socket.getOutputStream());
 				
 			
-				output.writeObject(new ConnectionRequestMessage(hostPort));
+				output.writeObject(new ConnectionRequestMessage(server.getPort()));
 				System.out.println("Sent server request message");
 				
 				listenToFrontEnd();
@@ -54,6 +54,7 @@ public class FrontEndCommunicator extends Thread {
 				Object obj = input.readObject();
 				
 				if (obj instanceof ConnectionRespondMessage) {
+					primary = ((ConnectionRespondMessage) obj).isPrimary();
 					System.out.println("Frontend responded with a ConnectionRespondMessage");
 				} else {
 					System.out.println("Can't parse message");
@@ -68,6 +69,6 @@ public class FrontEndCommunicator extends Thread {
 	}
 	
 	public Boolean getType() {
-		return type;
+		return primary;
 	}
 }
