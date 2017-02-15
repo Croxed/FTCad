@@ -100,7 +100,6 @@ public class ServerConnection implements Runnable {
 			disconnectSocket();
 			
 			System.out.println("Connecting to server");
-			
 			try {
 				connectToServer();
 			} catch (IOException e) {
@@ -173,7 +172,7 @@ public class ServerConnection implements Runnable {
 			mServerAddress = msg.getAddress();
 			mServerPort = msg.getPort();
 			
-			System.out.println("From frontend: ServerAddress: " + mServerAddress + " serverport: " + mServerPort);
+			System.out.println("Will connect to primary server with IP: " + mServerAddress + " and port: " + mServerPort);
 		} else {
 			// Got some unknown shit from the server probably, if ending up here!! 
 		}
