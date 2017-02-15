@@ -1,14 +1,16 @@
-package common;
+package common.ClientWithFrontEnd;
+
+import common.Message;
 
 import java.net.InetAddress;
 
 /**
  * Created by oscar on 2017-02-13.
  */
-public class ClientWithFrontEndConnectionRespondMessage extends Message {
+public class ConnectionRespondMessage extends Message {
     private InetAddress address;
     private int port;
-    public ClientWithFrontEndConnectionRespondMessage(InetAddress address, int port){
+    public ConnectionRespondMessage(InetAddress address, int port){
         this.address = address;
         this.port = port;
     }

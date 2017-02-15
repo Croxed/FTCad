@@ -3,7 +3,8 @@ package server;
 import java.io.*;
 import java.net.*;
 
-import common.*;
+import common.ServerWithFrontEnd.ConnectionRespondMessage;
+import common.ServerWithFrontEnd.ConnectionRequestMessage;
 
 public class FrontEndCommunicator extends Thread {
 	private Server server;
@@ -35,7 +36,7 @@ public class FrontEndCommunicator extends Thread {
 				output = new ObjectOutputStream(socket.getOutputStream());
 				
 			
-				output.writeObject(new ServerWithFrontEndConnectionRequestMessage(hostPort));
+				output.writeObject(new ConnectionRequestMessage(hostPort));
 				System.out.println("Sent server request message");
 				
 				listenToFrontEnd();
@@ -51,8 +52,8 @@ public class FrontEndCommunicator extends Thread {
 			try {
 				Object obj = input.readObject();
 				
-				if (obj instanceof ServerWithFrontEndConnectionRespondMessage) {
-					System.out.println("Frontend responded with a ServerWithFrontEndConnectionRespondMessage");
+				if (obj instanceof ConnectionRespondMessage) {
+					System.out.println("Frontend responded with a ConnectionRespondMessage");
 				} else {
 					System.out.println("Can't parse message");
 				}

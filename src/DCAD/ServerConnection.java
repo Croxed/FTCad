@@ -7,7 +7,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import common.*;
+import common.ClientWithFrontEnd.ConnectionRequestMessage;
+import common.ClientWithFrontEnd.ConnectionRespondMessage;
 
 public class ServerConnection implements Runnable {
 
@@ -92,14 +93,14 @@ public class ServerConnection implements Runnable {
 	private void getAddressFromFrontEnd() {
 		Object response = null;
 		try {
-			mOStream.writeObject(new ClientWithFrontEndConnectionRequestMessage());
+			mOStream.writeObject(new ConnectionRequestMessage());
 			response = mIStream.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-		if(response instanceof ClientWithFrontEndConnectionRespondMessage) {
-			ClientWithFrontEndConnectionRespondMessage msg = (ClientWithFrontEndConnectionRespondMessage)response;
+		if(response instanceof ConnectionRespondMessage) {
+			ConnectionRespondMessage msg = (ConnectionRespondMessage)response;
 			// Set the address to the primary server
 			mServerAddress = msg.getAddress();
 			mServerPort = msg.getPort();

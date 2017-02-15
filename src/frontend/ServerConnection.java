@@ -1,7 +1,7 @@
 package frontend;
 
 import common.PingMessage;
-import common.ServerWithFrontEndConnectionRespondMessage;
+import common.ServerWithFrontEnd.ConnectionRespondMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,9 +24,9 @@ public class ServerConnection implements Runnable {
         inputStream = iStream;
         isConnected = true;
         try {
-            System.out.println("Trying to send ServerWithFrontEndConnectionRespondMessage");
+            System.out.println("Trying to send ConnectionRespondMessage");
             // TODO: always tells servers they are primary
-            outputStream.writeObject(new ServerWithFrontEndConnectionRespondMessage(true));
+            outputStream.writeObject(new ConnectionRespondMessage(true));
         } catch (IOException e) {
             e.printStackTrace();
         }
