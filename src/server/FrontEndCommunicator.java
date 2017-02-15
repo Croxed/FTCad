@@ -104,6 +104,7 @@ public class FrontEndCommunicator extends Thread {
             while (isConnected) {
                 try {
                     output.writeObject(new PingMessage());
+                    System.out.print("!");
                 } catch (IOException e) {
                     System.err.println("Could not ping");
                 }
