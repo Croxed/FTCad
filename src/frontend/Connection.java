@@ -39,6 +39,7 @@ public class Connection implements Runnable {
                 } else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
                     if(m_connectedServers.size() >= 1) {
                         ServerConnection serverConnection = m_connectedServers.lastElement();
+                        System.out.println("A client connected!");
                         InetAddress address = serverConnection.getAddress();
                         int port = serverConnection.getPort();
                         outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
