@@ -65,7 +65,7 @@ public class GUI extends JFrame implements
 		setVisible(true);
     }
 
-    public void addToListener(){
+    public void addToListener() {
 		addWindowListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -107,84 +107,84 @@ public class GUI extends JFrame implements
     }
 
     public void mouseClicked(MouseEvent e) {
-	// User clicks the right mouse button:
-	// undo an operation by removing the most recently added object.
-	if(e.getButton() == MouseEvent.BUTTON3 && objectList.size() > 0) {
-	    objectList.removeLast();
-	}
-	repaint();
+		// User clicks the right mouse button:
+		// undo an operation by removing the most recently added object.
+		if(e.getButton() == MouseEvent.BUTTON3 && objectList.size() > 0) {
+		    objectList.removeLast();
+		}
+		repaint();
     }
 
     public void mouseReleased(MouseEvent e) {
-	if(current != null) {
-	    objectList.addLast(current);
-	    current = null;
-	}
-	repaint();
+		if(current != null) {
+		    objectList.addLast(current);
+		    current = null;
+		}
+		repaint();
     }
 
     // MouseMotionListener methods
     public void mouseMoved(MouseEvent e) {}
 
     public void mouseDragged(MouseEvent e) {
-	if(current != null && e.getX() > 0 && e.getY() > 91) {
-	    current.setDimensions(e.getX() - current.getX(), e.getY() - current.getY());
-	}
-	repaint();
+		if(current != null && e.getX() > 0 && e.getY() > 91) {
+		    current.setDimensions(e.getX() - current.getX(), e.getY() - current.getY());
+		}
+		repaint();
     }
 
     // ActionListener methods
     public void actionPerformed(ActionEvent e) {
-	if(e.getSource() == ovalButton) {
-	    template.setShape(Shape.OVAL);
-	}
-	else if(e.getSource() == rectangleButton) {
-	    template.setShape(Shape.RECTANGLE);
-	}
-	else if(e.getSource() == lineButton) {
-	    template.setShape(Shape.LINE);
-	}
-	else if(e.getSource() == filledOvalButton) {
-	    template.setShape(Shape.FILLED_OVAL);
-	}
-	else if(e.getSource() == filledRectangleButton) {
-	    template.setShape(Shape.FILLED_RECTANGLE);
-	}
-	else if(e.getSource() == redButton) {
-	    template.setColor(Color.RED);
-	}
-	else if(e.getSource() == blueButton) {
-	    template.setColor(Color.BLUE);
-	}
-	else if(e.getSource() == greenButton) {
-	    template.setColor(Color.GREEN);
-	}
-	else if(e.getSource() == whiteButton) {
-	    template.setColor(Color.WHITE);
-	}
-	else if(e.getSource() == pinkButton) {
-	    template.setColor(Color.PINK);
-	}
-	repaint();
+		if(e.getSource() == ovalButton) {
+		    template.setShape(Shape.OVAL);
+		}
+		else if(e.getSource() == rectangleButton) {
+		    template.setShape(Shape.RECTANGLE);
+		}
+		else if(e.getSource() == lineButton) {
+		    template.setShape(Shape.LINE);
+		}
+		else if(e.getSource() == filledOvalButton) {
+		    template.setShape(Shape.FILLED_OVAL);
+		}
+		else if(e.getSource() == filledRectangleButton) {
+		    template.setShape(Shape.FILLED_RECTANGLE);
+		}
+		else if(e.getSource() == redButton) {
+		    template.setColor(Color.RED);
+		}
+		else if(e.getSource() == blueButton) {
+		    template.setColor(Color.BLUE);
+		}
+		else if(e.getSource() == greenButton) {
+		    template.setColor(Color.GREEN);
+		}
+		else if(e.getSource() == whiteButton) {
+		    template.setColor(Color.WHITE);
+		}
+		else if(e.getSource() == pinkButton) {
+		    template.setColor(Color.PINK);
+		}
+		repaint();
     }
 
     public void update(Graphics g) {
-	g.setColor(Color.BLACK);
-	g.fillRect(0, 60, getSize().width, getSize().height - 60);
-
-	template.draw(g);
-
-	for(ListIterator<GObject> itr = objectList.listIterator(); itr.hasNext();) {
-	    itr.next().draw(g);
-	}
-
-	if(current != null) {
-	    current.draw(g);
-	}
-    }
-
-    public void paint(Graphics g) {
-	super.paint(g); // The superclass (JFrame) paint function draws the GUI components.
-	update(g);
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 60, getSize().width, getSize().height - 60);
+	
+		template.draw(g);
+	
+		for(ListIterator<GObject> itr = objectList.listIterator(); itr.hasNext();) {
+		    itr.next().draw(g);
+		}
+	
+		if(current != null) {
+		    current.draw(g);
+		}
+	    }
+	
+	    public void paint(Graphics g) {
+		super.paint(g); // The superclass (JFrame) paint function draws the GUI components.
+		update(g);
     }
 }
