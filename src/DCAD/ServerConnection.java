@@ -48,17 +48,7 @@ public class ServerConnection implements Runnable {
 	@Override
 	public void run() {
 		
-		System.out.println("Attempting to connect to Frontend");
-		connectToFrontEnd();
-		
-		System.out.println("Getting address information to the main server");
-		getAddressFromFrontEnd();
-		
-		System.out.println("Disconnecting from Frontend");
-		disconnectSocket();
-		
-		System.out.println("Connecting to server");
-		connectToServer();
+		initializeConnections();
 		
 		while(mIsConnected) {
 			// While the client is connected to the server
@@ -75,6 +65,45 @@ public class ServerConnection implements Runnable {
 	}
 
 	/**
+	 * Initializes all connections to the server. 
+	 */
+	private void initializeConnections() {
+		// 
+		boolean isConnectedToFrontEnd = false;
+		int attempts = 0;
+		do {
+			System.out.println("Attempting to connect to Frontend");
+			try {
+				connectToFrontEnd();
+				isConnectedToFrontEnd = true;
+			} catch (IOException e) {
+				isConnectedToFrontEnd = false;
+			}
+			// Take a nap so it does not "spam connect"
+			if(!isConnectedToFrontEnd) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) { e.printStackTrace(); }
+			}
+		} while(isConnectedToFrontEnd && attempts < 10);
+		
+		if(isConnectedToFrontEnd) {
+			System.out.println("Getting address information to the main server");
+			getAddressFromFrontEnd();
+			
+			System.out.println("Disconnecting from Frontend");
+			disconnectSocket();
+			
+			System.out.println("Connecting to server");
+			connectToServer();
+		} else {
+			System.out.println("Failed to connect to the Frontend. Don't use this program any more pls");
+		}
+		
+		
+	}
+
+	/**
 	 * Listens to the actions received from the server.
 	 * Possibly a loopception here o_O. 
 	 */
@@ -87,6 +116,7 @@ public class ServerConnection implements Runnable {
 			try {
 				input = mIStream.readObject();
 			} catch (ClassNotFoundException | IOException e) {
+				mIsListening = false;
 				e.printStackTrace();
 			}
 			// Handle the input and put to / update the GUI.
@@ -95,6 +125,7 @@ public class ServerConnection implements Runnable {
 
 	/**
 	 * Connects to the primary server. The address should be obtained from the front end.
+	 * @throws IOException 
 	 */
 	private void connectToServer() {
 		try {
@@ -102,18 +133,18 @@ public class ServerConnection implements Runnable {
 			mOStream = new ObjectOutputStream(mSocket.getOutputStream());
 			mIStream = new ObjectInputStream(mSocket.getInputStream());
 			mIsConnected = true;
-		} catch (IOException e) { e.printStackTrace(); }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * Connects to the front end, in order to get the address to the main server. 
 	 */
-	private void connectToFrontEnd() {
-		try {
-			mSocket = new Socket(mFrontEndAddress, mFrontEndPort);
-			mOStream = new ObjectOutputStream(mSocket.getOutputStream());
-			mIStream = new ObjectInputStream(mSocket.getInputStream());
-		} catch (IOException e) { e.printStackTrace(); }
+	private void connectToFrontEnd() throws IOException {
+		mSocket = new Socket(mFrontEndAddress, mFrontEndPort);
+		mOStream = new ObjectOutputStream(mSocket.getOutputStream());
+		mIStream = new ObjectInputStream(mSocket.getInputStream());
 	}
 	
 	/**
