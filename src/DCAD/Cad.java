@@ -22,6 +22,7 @@ public class Cad {
     private Cad(String[] args) {
     	if(args.length > 1){
     		mConnection = new ServerConnection(args[0], Integer.parseInt(args[1]));
+    		gui.serverCon(mConnection);
         	new Thread(mConnection).start();
     	} else {
     		System.err.println("Need arguments <Frontend address> <Frontend port>");
