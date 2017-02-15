@@ -66,6 +66,10 @@ public class ServerConnection implements Runnable {
 		//  
 	}
 
+	/**
+	 * Listens to the actions received from the server.
+	 * Possibly a loopception here o_O. 
+	 */
 	private void listenForServerActions() {
 		System.out.println("Listening for server actions");
 		while(true) {
@@ -122,7 +126,7 @@ public class ServerConnection implements Runnable {
 			
 			System.out.println("From frontend: ServerAddress: " + mServerAddress + " serverport: " + mServerPort);
 		} else {
-			// Got some unknown shit from the server probably.
+			// Got some unknown shit from the server probably, if ending up here!! 
 		}
 	}
 
