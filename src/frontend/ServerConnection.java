@@ -18,10 +18,12 @@ public class ServerConnection implements Runnable {
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private volatile boolean isConnected;
-    private FrontEnd m_fronEnd;
+    private FrontEnd m_frontEnd;
+    private Connection m_connection;
 
-    public ServerConnection(FrontEnd frontEnd, Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream, int portnr) {
-        m_fronEnd = frontEnd;
+    public ServerConnection(FrontEnd frontEnd, Connection connection, Socket socket, ObjectOutputStream oStream, ObjectInputStream iStream, int portnr) {
+        m_connection = connection;
+        m_frontEnd = frontEnd;
         m_portNr = portnr;
         m_socket = socket;
         outputStream = oStream;
@@ -66,6 +68,7 @@ public class ServerConnection implements Runnable {
             System.out.println("Not connected");
             pingThread.interrupt();
             pingThread.join();
+            m_connection.getConnectedServers().remove(this);
             m_socket.close();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
