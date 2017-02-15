@@ -10,9 +10,16 @@ import java.net.UnknownHostException;
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
 
+/**
+ * A class that represents the CAD client side connection. 
+ * The ServerConnection should connect to a front end and ask for connection details to the primary server. 
+ * @author mattiasolsson
+ *
+ */
 public class ServerConnection implements Runnable {
 
-	private boolean isConnected = false;
+	private boolean mIsConnected = false;
+	private boolean mIsListening = false;
 	
 	private Socket mSocket;
 	private ObjectOutputStream mOStream;
@@ -53,9 +60,10 @@ public class ServerConnection implements Runnable {
 		System.out.println("Connecting to server");
 		connectToServer();
 		
-		while(isConnected) {
+		while(mIsConnected) {
 			// While the client is connected to the server
 			// Supply the clients actions to the server and listen for actions created from the server
+			mIsListening = true;
 			listenForServerActions();
 		}
 		
@@ -72,7 +80,9 @@ public class ServerConnection implements Runnable {
 	 */
 	private void listenForServerActions() {
 		System.out.println("Listening for server actions");
-		while(true) {
+		while(mIsListening) {
+			System.out.println("Waiting for input from the server");
+			// Receive some input from the server
 			Object input;
 			try {
 				input = mIStream.readObject();
@@ -91,7 +101,7 @@ public class ServerConnection implements Runnable {
 			mSocket = new Socket(mServerAddress, mServerPort);
 			mOStream = new ObjectOutputStream(mSocket.getOutputStream());
 			mIStream = new ObjectInputStream(mSocket.getInputStream());
-			isConnected = true;
+			mIsConnected = true;
 		} catch (IOException e) { e.printStackTrace(); }
 	}
 
@@ -138,7 +148,7 @@ public class ServerConnection implements Runnable {
 			mOStream.close();
 			mIStream.close();
 			mSocket.close();
-			isConnected = false;
+			mIsConnected = false;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
