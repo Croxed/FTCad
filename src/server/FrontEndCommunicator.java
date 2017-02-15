@@ -41,8 +41,9 @@ public class FrontEndCommunicator extends Thread {
 				
 				listenToFrontEnd();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Connection refused. Trying again in 1 second");
+				try { Thread.sleep(1000); } catch (InterruptedException sleep) { }
+				
 			}
 		}
 	}

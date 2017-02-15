@@ -79,6 +79,7 @@ public class Server {
 			try {
 				// Wait for new connections and accept
 				client = socket.accept();
+				System.out.println("accepted client");
 				// Create a new ClientConnection thread for the new socket and start the thread
 				ClientConnection cc = new ClientConnection(client);
 				cc.start();

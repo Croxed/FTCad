@@ -28,6 +28,7 @@ public class ClientConnection extends Thread {
 	 * Thread main loop, used to listen to messages
 	 */
 	public void run() {
+		System.out.println("Client connected " + socket.getInetAddress().toString() + ":" + socket.getPort());
 		while(true) {
 			try {
 				Object inData = input.readObject();
