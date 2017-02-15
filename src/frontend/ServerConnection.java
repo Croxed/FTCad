@@ -77,9 +77,11 @@ public class ServerConnection implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     outputStream.writeObject(new PingMessage());
-                    Thread.sleep(1000);
                 } catch (IOException e) {
                     System.err.println("Could not ping");
+                }
+                try{
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
