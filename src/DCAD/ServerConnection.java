@@ -68,9 +68,14 @@ public class ServerConnection implements Runnable {
 	 * Initializes all connections to the server. 
 	 */
 	private void initializeConnections() {
-		// 
+		
+		// Set up some flags
 		boolean isConnectedToFrontEnd = false;
+
+		// Keep the number of attempts 
 		int attempts = 0;
+		
+		// 
 		do {
 			System.out.println("Attempting to connect to Frontend");
 			try {
@@ -85,7 +90,7 @@ public class ServerConnection implements Runnable {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) { e.printStackTrace(); }
 			}
-		} while(isConnectedToFrontEnd && attempts < 10);
+		} while(!isConnectedToFrontEnd && attempts++ < 10);
 		
 		if(isConnectedToFrontEnd) {
 			System.out.println("Getting address information to the main server");
@@ -95,7 +100,13 @@ public class ServerConnection implements Runnable {
 			disconnectSocket();
 			
 			System.out.println("Connecting to server");
-			connectToServer();
+			
+			try {
+				connectToServer();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 		} else {
 			System.out.println("Failed to connect to the Frontend. Don't use this program any more pls");
 		}
@@ -127,19 +138,16 @@ public class ServerConnection implements Runnable {
 	 * Connects to the primary server. The address should be obtained from the front end.
 	 * @throws IOException 
 	 */
-	private void connectToServer() {
-		try {
-			mSocket = new Socket(mServerAddress, mServerPort);
-			mOStream = new ObjectOutputStream(mSocket.getOutputStream());
-			mIStream = new ObjectInputStream(mSocket.getInputStream());
-			mIsConnected = true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private void connectToServer() throws IOException {
+		mSocket = new Socket(mServerAddress, mServerPort);
+		mOStream = new ObjectOutputStream(mSocket.getOutputStream());
+		mIStream = new ObjectInputStream(mSocket.getInputStream());
+		mIsConnected = true;
 	}
 
 	/**
-	 * Connects to the front end, in order to get the address to the main server. 
+	 * Connects to the front end, in order to get the address to the main server.
+	 * @throws IOException
 	 */
 	private void connectToFrontEnd() throws IOException {
 		mSocket = new Socket(mFrontEndAddress, mFrontEndPort);
