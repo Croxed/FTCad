@@ -16,6 +16,8 @@ public class FrontEndCommunicator extends Thread {
 	private final int hostPort;
 	
 	private Boolean primary;
+	
+    private volatile boolean isConnected = false;
 
 	/**
 	 * Connects and listens to frontend 
@@ -46,10 +48,14 @@ public class FrontEndCommunicator extends Thread {
 				output.writeObject(new ConnectionRequestMessage(server.getPort()));
 				System.out.println("Sent server request message");
 				
-				Pinger ping = new Pinger();
+				isConnected = true;
+				
+				Thread ping = new Thread(new Pinger());
 				ping.start();
 				
 				listenToFrontEnd();
+				
+				isConnected = false;
 				try {
 					ping.interrupt();
 					ping.join();
@@ -75,6 +81,7 @@ public class FrontEndCommunicator extends Thread {
 					primary = ((ConnectionRespondMessage) obj).isPrimary();
 					System.out.println("Frontend responded with a ConnectionRespondMessage");
 				} else if (obj instanceof PingMessage) {
+					System.out.print(".");
 				} else {
 					System.out.println("Can't parse message" + obj.getClass());
 				}
@@ -82,6 +89,7 @@ public class FrontEndCommunicator extends Thread {
 				System.out.println("Can't parse message");
 			} catch (IOException e) {
 				System.out.println("Error when reading");
+				e.printStackTrace();
 				return;
 			}
 		}
@@ -90,17 +98,21 @@ public class FrontEndCommunicator extends Thread {
 	public Boolean getType() {
 		return primary;
 	}
-	
-	private class Pinger extends Thread {
-		public void run() {
-			while (!Thread.currentThread().isInterrupted()) {
-				try {
-					output.writeObject(new PingMessage());
-					try { Thread.sleep(1000); } catch (InterruptedException sleep) { }
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+
+    private class Pinger implements Runnable{
+        public void run() {
+            while (isConnected) {
+                try {
+                    output.writeObject(new PingMessage());
+                } catch (IOException e) {
+                    System.err.println("Could not ping");
+                }
+                try{
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println("Could not sleep");
+                }
+            }
+        }
+    }
 }
