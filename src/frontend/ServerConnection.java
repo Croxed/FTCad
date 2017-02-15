@@ -63,6 +63,7 @@ public class ServerConnection implements Runnable {
             }
         }
         try{
+            System.out.println("Not connected");
             pingThread.interrupt();
             pingThread.join();
             m_socket.close();
@@ -74,7 +75,7 @@ public class ServerConnection implements Runnable {
     private class Pinger implements Runnable{
         @Override
         public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
+            while (isConnected) {
                 try {
                     outputStream.writeObject(new PingMessage());
                 } catch (IOException e) {
@@ -83,7 +84,7 @@ public class ServerConnection implements Runnable {
                 try{
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.err.println("Could not sleep");
                 }
             }
         }
