@@ -74,8 +74,9 @@ public class FrontEndCommunicator extends Thread {
 				if (obj instanceof ConnectionRespondMessage) {
 					primary = ((ConnectionRespondMessage) obj).isPrimary();
 					System.out.println("Frontend responded with a ConnectionRespondMessage");
+				} else if (obj instanceof PingMessage) {
 				} else {
-					System.out.println("Can't parse message");
+					System.out.println("Can't parse message" + obj.getClass());
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("Can't parse message");
