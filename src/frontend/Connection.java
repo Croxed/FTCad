@@ -19,6 +19,7 @@ public class Connection implements Runnable {
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private volatile int m_portnr;
+    private volatile boolean isPrimary;
     private volatile boolean isConnected;
 
     public Connection(FrontEnd frontEnd, Socket socket) {
@@ -48,6 +49,8 @@ public class Connection implements Runnable {
                 m_portnr = msg.getPortNr();
                 System.out.println("A server connected!");
                 connectedServer.add(this);
+                outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(!isPrimary));
+                isPrimary = true;
             } else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
                 if (connectedServer.size() >= 1) {
                     Connection serverConnection = connectedServer.lastElement();
