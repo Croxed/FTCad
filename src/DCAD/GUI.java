@@ -42,6 +42,8 @@ public class GUI extends JFrame implements
     private GObject current = null;
 
     private LinkedList<GObject> objectList = new LinkedList<GObject>();
+    
+    private ServerConnection mConnection;
 	
     public GUI(int xpos, int ypos) {
         setSize(xpos,ypos);
@@ -118,6 +120,7 @@ public class GUI extends JFrame implements
     public void mouseReleased(MouseEvent e) {
 		if(current != null) {
 		    objectList.addLast(current);
+		    mConnection.sendServerActions(current);
 		    current = null;
 		}
 		repaint();
@@ -187,4 +190,7 @@ public class GUI extends JFrame implements
 		super.paint(g); // The superclass (JFrame) paint function draws the GUI components.
 		update(g);
     }
+	public void serverCon(ServerConnection c){
+		mConnection = c;
+	}
 }

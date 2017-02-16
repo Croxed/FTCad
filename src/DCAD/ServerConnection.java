@@ -144,6 +144,10 @@ public class ServerConnection implements Runnable {
 //			}
 		}
 	}
+	
+	public void sendServerActions(GObject o){
+		
+	}
 
 	/**
 	 * Connects to the primary server. The address should be obtained from the front end.
