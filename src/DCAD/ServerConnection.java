@@ -164,7 +164,7 @@ public class ServerConnection implements Runnable {
 		try {
 			mOStream.writeObject(clientActionMessage);
 		} catch (IOException e) {
-			System.err.println("Failed to send a graphical object to the server");
+			System.err.println("Failed to send a ClientActionMessage to the server");
 		}
 	}
 
