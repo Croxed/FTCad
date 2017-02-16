@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Created by oscar on 2017-02-13.
@@ -70,7 +71,7 @@ public class ServerConnection implements Runnable {
             System.out.println("Not connected");
             pingThread.interrupt();
             pingThread.join();
-            m_connection.getConnectedServers().remove(this);
+            //m_connection.getConnectedServers().remove(this);
             m_socket.close();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

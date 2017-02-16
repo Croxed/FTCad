@@ -1,6 +1,8 @@
 package frontend;
 
 
+import common.PingMessage;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,62 +15,104 @@ import java.util.Vector;
  */
 public class Connection implements Runnable {
     private volatile Socket m_socket;
-    private volatile Socket m_newSocket;
     private volatile FrontEnd m_frontEnd;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
+    private volatile int m_portnr;
+    private volatile boolean isConnected;
 
-    public Vector<ServerConnection> getConnectedServers() {
-        return m_connectedServers;
+    public Connection(FrontEnd frontEnd, Socket socket) {
+        m_frontEnd = frontEnd;
+        m_socket = socket;
+        isConnected = true;
     }
 
-    private volatile Vector<ServerConnection> m_connectedServers = new Vector<>();
+    public synchronized InetAddress getAddress(){
+        return m_socket.getInetAddress();
+    }
 
-    public Connection(FrontEnd frontEnd) {
-        m_frontEnd = frontEnd;
+    public synchronized int getPort(){
+        return m_portnr;
     }
 
     @SuppressWarnings("Duplicates")
     @Override
     public void run() {
-        while (true) {
+        try {
+            outputStream = new ObjectOutputStream(m_socket.getOutputStream());
+            inputStream = new ObjectInputStream(m_socket.getInputStream());
+            Object input = inputStream.readObject();
+            Vector<Connection> connectedServer = m_frontEnd.getConnectedServers();
+            if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
+                common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
+                m_portnr = msg.getPortNr();
+                System.out.println("A server connected!");
+                connectedServer.add(this);
+            } else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
+                if (connectedServer.size() >= 1) {
+                    Connection serverConnection = connectedServer.lastElement();
+                    System.out.println("A client connected!");
+                    InetAddress address = serverConnection.getAddress();
+                    int port = serverConnection.getPort();
+                    System.out.println(address.toString() + ":" + port);
+                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
+                } else {
+                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
+                }
+                isConnected = false;
+            }
+        } catch (IOException | ClassNotFoundException e) {
             try {
-                while (m_socket == m_newSocket) {
-                }
-                m_socket = m_newSocket;
-                ObjectOutputStream outputStream = new ObjectOutputStream(m_socket.getOutputStream());
-                ObjectInputStream inputStream = new ObjectInputStream(m_socket.getInputStream());
-                Object input = inputStream.readObject();
-                if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
-                    common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
-                    ServerConnection serverConnection = new ServerConnection(m_frontEnd, this, m_socket, outputStream, inputStream, msg.getPortNr());
-                    System.out.println("A server connected!");
-                    Thread serverThread = new Thread(serverConnection);
-                    serverThread.start();
-                    m_connectedServers.add(serverConnection);
-                } else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
-                    if(m_connectedServers.size() >= 1) {
-                        ServerConnection serverConnection = m_connectedServers.lastElement();
-                        System.out.println("A client connected!");
-                        InetAddress address = serverConnection.getAddress();
-                        int port = serverConnection.getPort();
-                        System.out.println(address.toString() + ":" + port);
-                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
-                    }
-                    else{
-                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
-                    }
-                }
-            } catch (IOException | ClassNotFoundException e) {
+                Thread.sleep(1000);
+                System.err.println("Could not receive message");
+            } catch (InterruptedException e1) {
+                System.err.println("Could not sleep");
+            }
+        }
+        while (isConnected) {
+            Thread pingThread = new Thread(new Pinger());
+            pingThread.start();
+            while (isConnected) {
+                Object input;
                 try {
+                    m_socket.setSoTimeout(5000);
+                    input = inputStream.readObject();
+                    if(input instanceof PingMessage)
+                        System.out.print(".");
+                } catch (IOException | ClassNotFoundException e) {
+                    isConnected = false;
+                }
+            }
+            try{
+                System.out.println("Not connected");
+                pingThread.interrupt();
+                pingThread.join();
+                m_frontEnd.getConnectedServers().remove(this);
+                m_socket.close();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    private class Pinger implements Runnable{
+        @Override
+        public void run() {
+            while (isConnected) {
+                try {
+                    outputStream.writeObject(new PingMessage());
+                    System.out.print("!");
+                } catch (IOException e) {
+                    System.err.println("Could not ping");
+                }
+                try{
                     Thread.sleep(1000);
-                    System.err.println("Could not receive message");
-                } catch (InterruptedException e1) {
+                } catch (InterruptedException e) {
                     System.err.println("Could not sleep");
                 }
             }
         }
     }
 
-    public void setNewSocket(Socket m_newSocket) {
-        this.m_newSocket = m_newSocket;
-    }
 }

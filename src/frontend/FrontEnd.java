@@ -3,6 +3,7 @@ package frontend;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Vector;
 
 /**
  * Created by oscar on 2017-02-13.
@@ -10,6 +11,7 @@ import java.net.Socket;
 public class FrontEnd {
     private ServerSocket m_serverSocket;
     private Socket m_socket;
+    private volatile Vector<Connection> m_connectedServers = new Vector<>();
 
     public FrontEnd(int portNumber) throws IOException {
         m_serverSocket = new ServerSocket(portNumber);
@@ -32,15 +34,19 @@ public class FrontEnd {
         }
     }
 
+    public synchronized Vector<Connection> getConnectedServers() {
+        return m_connectedServers;
+    }
+
     private void listenForMessages() {
         System.out.println("Listening for messages");
-        Connection connection = new Connection(this);
-        Thread connectionThread = new Thread(connection);
-        connectionThread.start();
         while (true) {
             try {
                 m_socket = m_serverSocket.accept();
-                connection.setNewSocket(m_socket);
+                System.out.println("New connection!");
+                Connection connection = new Connection(this, m_socket);
+                Thread connectionThread = new Thread(connection);
+                connectionThread.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
