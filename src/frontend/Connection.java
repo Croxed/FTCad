@@ -35,13 +35,14 @@ public class Connection implements Runnable {
     public synchronized int getPort(){
         return m_portnr;
     }
-
+//opens stream to server from the frontend
     private synchronized void openStream(){
         try {
             outputStream = new ObjectOutputStream(m_socket.getOutputStream());
             inputStream = new ObjectInputStream(m_socket.getInputStream());
             Object input = inputStream.readObject();
             Vector<Connection> connectedServer = m_frontEnd.getConnectedServers();
+//message received from server to receive information
             if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
                 common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
                 m_portnr = msg.getPortNr();
@@ -49,6 +50,7 @@ public class Connection implements Runnable {
                 connectedServer.add(this);
                 outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(!isPrimary));
                 isPrimary = true;
+//message from client requesting server to connect to
             } else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
                 if (connectedServer.size() >= 1) {
                     Connection serverConnection = connectedServer.lastElement();
@@ -74,6 +76,8 @@ public class Connection implements Runnable {
 
     @SuppressWarnings("Duplicates")
     @Override
+    
+//Pings to see if connection is on
     public void run() {
         openStream();
         while (isConnected) {
