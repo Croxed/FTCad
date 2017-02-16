@@ -145,7 +145,12 @@ public class ServerConnection implements Runnable {
 	}
 	
 	public void sendServerActions(GObject o){
-		
+		System.out.println("Sending object to Server");
+		try{
+			mOStream.writeObject(o);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 
 	/**
