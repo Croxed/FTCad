@@ -13,6 +13,12 @@ public class FrontEnd {
     private Socket m_socket;
     private volatile Vector<Connection> m_connectedServers = new Vector<>();
 
+    /**
+     * Create a front end, where the port number is the port where the front end should listen for
+     * new connections.
+     * @param portNumber Port number to listen on
+     * @throws IOException If front end could not create a new ServerSocket.
+     */
     public FrontEnd(int portNumber) throws IOException {
         m_serverSocket = new ServerSocket(portNumber);
     }
@@ -34,10 +40,18 @@ public class FrontEnd {
         }
     }
 
+    /**
+     * Get a vector of connected servers.
+     * @return Vector with connected servers.
+     */
     public synchronized Vector<Connection> getConnectedServers() {
         return m_connectedServers;
     }
 
+    /**
+     * Listens for new connections.
+     * Creates a new connection when someone connects to the front end.
+     */
     private void listenForMessages() {
         System.out.println("Listening for messages");
         while (true) {

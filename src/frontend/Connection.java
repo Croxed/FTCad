@@ -28,21 +28,34 @@ public class Connection implements Runnable {
         isConnected = true;
     }
 
+    /**
+     * Get connection of the current socket
+     * @return Address of connection
+     */
     public synchronized InetAddress getAddress(){
         return m_socket.getInetAddress();
     }
 
+    /**
+     * Get port of the server that connected to front end
+     * @return
+     */
     public synchronized int getPort(){
         return m_portnr;
     }
-//opens stream to server from the frontend
+
+    /**
+     * Open the streams and detect whether a server or a client connected to the front end.
+     * If a server connected, add it to the list of connected servers in front end, and determine if it should be primary server.
+     * It a client connected, send back the information about the primary server.
+     */
     private synchronized void openStream(){
         try {
             outputStream = new ObjectOutputStream(m_socket.getOutputStream());
             inputStream = new ObjectInputStream(m_socket.getInputStream());
             Object input = inputStream.readObject();
             Vector<Connection> connectedServer = m_frontEnd.getConnectedServers();
-//message received from server to receive information
+            //Determines if the message is from a server
             if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
                 common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
                 m_portnr = msg.getPortNr();
@@ -50,8 +63,9 @@ public class Connection implements Runnable {
                 connectedServer.add(this);
                 outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(!isPrimary));
                 isPrimary = true;
-//message from client requesting server to connect to
-            } else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
+            }
+            // Determines if the message is from a client
+            else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
                 if (connectedServer.size() >= 1) {
                     Connection serverConnection = connectedServer.lastElement();
                     System.out.println("A client connected!");
@@ -74,10 +88,13 @@ public class Connection implements Runnable {
         }
     }
 
+    /**
+     * Starts a new ping thread and listens for PingMessages.
+     * If the connection hasn't received a ping within 5000 milliseconds, close the connection
+     * and end the ping thread.
+     */
     @SuppressWarnings("Duplicates")
     @Override
-    
-//Pings to see if connection is on
     public void run() {
         openStream();
         while (isConnected) {
@@ -106,6 +123,10 @@ public class Connection implements Runnable {
         }
     }
 
+    /**
+     * Thread to ping the server that connected.
+     * Does this every second, thus Thread.sleep(1000).
+     */
     @SuppressWarnings("Duplicates")
     private class Pinger implements Runnable{
         @Override
