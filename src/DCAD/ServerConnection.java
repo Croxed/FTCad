@@ -145,6 +145,7 @@ public class ServerConnection implements Runnable {
 		}
 	}
 	
+<<<<<<< HEAD
 	/**
 	 * Send the action to the server. This method is called from the GUI.
 	 * @param gObject the graphical object to send to the server
@@ -154,6 +155,14 @@ public class ServerConnection implements Runnable {
 			mOStream.writeObject(gObject);
 		} catch (IOException e) {
 			System.err.println("Failed to send a graphical object to the server");
+=======
+	public void sendServerActions(GObject o){
+		System.out.println("Sending object to Server");
+		try{
+			mOStream.writeObject(o);
+		}catch(IOException e){
+			e.printStackTrace();
+>>>>>>> 5c62b9a50bb74790ac2fb79a2a7c844059c3b0a9
 		}
 	}
 
