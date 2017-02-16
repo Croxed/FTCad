@@ -99,7 +99,7 @@ public class GUI extends JFrame implements
     public void mousePressed(MouseEvent e) {
 		if(e.getButton() == MouseEvent.BUTTON1) {
 		    if(e.getX() > 0 && e.getY() > 91) {
-			current = new GObject(template.getShape(), template.getColor(), e.getX(), e.getY(), 0, 0);
+		    	current = new GObject(template.getShape(), template.getColor(), e.getX(), e.getY(), 0, 0);
 		    }
 		    else current = null;
 		}
@@ -175,15 +175,15 @@ public class GUI extends JFrame implements
 		template.draw(g);
 	
 		for(ListIterator<GObject> itr = objectList.listIterator(); itr.hasNext();) {
-		    itr.next().draw(g);
+			    itr.next().draw(g);
 		}
-	
+		
 		if(current != null) {
 		    current.draw(g);
 		}
-	    }
+    }
 	
-	    public void paint(Graphics g) {
+	public void paint(Graphics g) {
 		super.paint(g); // The superclass (JFrame) paint function draws the GUI components.
 		update(g);
     }

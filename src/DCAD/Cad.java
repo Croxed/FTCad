@@ -10,14 +10,18 @@ public class Cad {
     static private GUI gui = new GUI(750, 600);
     private ServerConnection mConnection;
     
+    /**
+     * Runs the client project.
+     * @param args the connection details
+     */
     public static void main(String[] args) {
         gui.addToListener();
         new Cad(args);
     }
     
     /**
-     * Creates connection to the server.
-     * @param args
+     * Constructs the Cad object. Creates connection to the server.
+     * @param args the connection details from main()
      */
     private Cad(String[] args) {
     	if(args.length > 1){
