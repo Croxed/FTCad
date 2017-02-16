@@ -71,7 +71,10 @@ public class FrontEndCommunicator extends Thread {
 			}
 		}
 	}
-	
+
+	/**
+	 * Listen for messages from the front end
+	 */
 	private void listenToFrontEnd() {
 		while (true) {
 			try {
@@ -94,11 +97,16 @@ public class FrontEndCommunicator extends Thread {
 			}
 		}
 	}
-	
+	/**
+	 * Get which type of server it is
+	 */
 	public Boolean getType() {
 		return primary;
 	}
 
+	/**
+	 * Keep pinging the frontend
+	 */
     private class Pinger implements Runnable{
         public void run() {
             while (isConnected) {

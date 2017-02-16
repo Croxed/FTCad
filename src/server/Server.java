@@ -43,7 +43,7 @@ public class Server {
 	}
 
 	/**
-	 * Start the server and bind to a port
+	 * Init Server object
 	 * @param port number to start the server on
 	 * @throws IOException if the server could not bind to the specified port
 	 */
@@ -52,18 +52,24 @@ public class Server {
 	}
 
 
+	/**
+	 * Talk with frontend and if successful listen for connections
+	 * @param hostname of frontend
+	 * @param port of frontend
+	 * @throws IOException 
+	 */
 	private void talkWithFrontend(String hostName, int hostPort) throws IOException {
-
-			fec = new FrontEndCommunicator(this, hostName, hostPort);
-			fec.start();
-			// Wait for response from frontend before starting server
-			while (true) {
-				if (fec.getType() != null) {
-					listenForConnections();
-					return;
-				}
-				try { Thread.sleep(50); } catch (InterruptedException sleep) { }
+		//Starts the front end thread
+		fec = new FrontEndCommunicator(this, hostName, hostPort);
+		fec.start();
+		// Wait for response from frontend before starting server
+		while (true) {
+			if (fec.getType() != null) {
+				listenForConnections();
+				return;
 			}
+			try { Thread.sleep(50); } catch (InterruptedException sleep) { }
+		}
 	}
 
 	/**
@@ -72,7 +78,7 @@ public class Server {
 	 */
 	public void listenForConnections() throws IOException {
 		socket = new ServerSocket(port);
-		System.out.println("Waiting for client messages... ");
+		System.out.println("Waiting for client messages on port " + port);
 		
 		// Keep listening
 		while (true) {
@@ -89,7 +95,10 @@ public class Server {
 			}
 		}
 	}
-	
+
+	/**
+	 * @return port number the server is bound to
+	 */
 	public int getPort() {
 		return port;
 	}
