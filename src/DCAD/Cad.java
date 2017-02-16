@@ -24,9 +24,9 @@ public class Cad {
      * @param args the connection details from main()
      */
     private Cad(String[] args) {
-    	if(args.length > 1){
+    	if(args.length > 1) {
     		mConnection = new ServerConnection(args[0], Integer.parseInt(args[1]));
-    		gui.serverCon(mConnection);
+    		gui.setServerConnection(mConnection);
         	new Thread(mConnection).start();
     	} else {
     		System.err.println("Need arguments <Frontend address> <Frontend port>");

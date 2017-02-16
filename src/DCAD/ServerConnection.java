@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
 
@@ -57,7 +56,7 @@ public class ServerConnection implements Runnable {
 			listenForServerActions();
 		}
 		
-		System.out.println("Disconnects from the server");
+		System.out.println("Disconnecting from the server");
 		try {
 			disconnectSocket();
 		} catch (IOException e) {
