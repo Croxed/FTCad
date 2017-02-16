@@ -190,6 +190,7 @@ public class GUI extends JFrame implements
 		super.paint(g); // The superclass (JFrame) paint function draws the GUI components.
 		update(g);
     }
+	
 	public void setServerConnection(ServerConnection serverConnection) {
 		mServerConnection = serverConnection;
 	}

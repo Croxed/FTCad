@@ -129,7 +129,7 @@ public class ServerConnection implements Runnable {
 		while(mIsListening) {
 			System.out.println("Waiting for input from the server");
 			// Receive some input from the server
-			Object input;
+			Object input = null;
 			try {
 				input = mIStream.readObject();
 			} catch (ClassNotFoundException | IOException e) {
@@ -138,14 +138,23 @@ public class ServerConnection implements Runnable {
 			}
 			
 			// Handle the input and put to / update the GUI.
-//			if(input instanceof xx) {
-//				// Convert to correct object etc
-//			}
+			if(input instanceof GObject) {
+				GObject graphicalObject = (GObject)input;
+				// Convert to correct object etc
+			}
 		}
 	}
 	
-	public void sendServerActions(GObject o){
-		
+	/**
+	 * Send the action to the server. This method is called from the GUI.
+	 * @param gObject the graphical object to send to the server
+	 */
+	public void sendServerActions(GObject gObject) {
+		try {
+			mOStream.writeObject(gObject);
+		} catch (IOException e) {
+			System.err.println("Failed to send a graphical object to the server");
+		}
 	}
 
 	/**
