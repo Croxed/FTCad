@@ -134,7 +134,7 @@ public class ServerConnection implements Runnable {
 				input = mIStream.readObject();
 			} catch (ClassNotFoundException | IOException e) {
 				mIsListening = false;
-				e.printStackTrace();
+				System.err.println("Received some weird shit from the server");
 			}
 			
 			// Handle the input and put to / update the GUI.
@@ -146,10 +146,12 @@ public class ServerConnection implements Runnable {
 	}
 	
 	/**
-	 * Send the action to the server. This method is called from the GUI.
+	 * Send a "create" or "delete" action to the server. This method should be called from the GUI.
 	 * @param gObject the graphical object to send to the server
 	 */
 	public void sendServerActions(GObject gObject) {
+		//TODO As a "delete action" would also send shit to the server, this function should handle that to.
+		// This function should be named "sendAction(GObject)" or something like that as it is called on the server obJ. 
 		try {
 			mOStream.writeObject(gObject);
 		} catch (IOException e) {
@@ -159,7 +161,7 @@ public class ServerConnection implements Runnable {
 
 	/**
 	 * Connects to the primary server. The address should be obtained from the front end.
-	 * @throws IOException 
+	 * @throws IOException if the socket or the streams cannot be instantiated
 	 */
 	private void connectToPrimaryServer() throws IOException {
 		mSocket = new Socket(mServerAddress, mServerPort);
@@ -170,7 +172,7 @@ public class ServerConnection implements Runnable {
 
 	/**
 	 * Connects to the front end, in order to get the address to the main server.
-	 * @throws IOException
+	 * @throws IOException if the socket or the streams cannot be opened.
 	 */
 	private void connectToFrontEnd() throws IOException {
 		mSocket = new Socket(mFrontEndAddress, mFrontEndPort);
@@ -203,8 +205,8 @@ public class ServerConnection implements Runnable {
 	}
 
 	/**
-	 * Disconnects from the Front end.
-	 * @throws IOException
+	 * Disconnects the socket, whether is connected to the front end or the primary server.
+	 * @throws IOException if the streams cannot be closed, or if the socket cannot be closed. 
 	 */
 	private void disconnectSocket() throws IOException {
 		mOStream.close();
