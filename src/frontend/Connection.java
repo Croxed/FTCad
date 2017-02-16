@@ -36,9 +36,7 @@ public class Connection implements Runnable {
         return m_portnr;
     }
 
-    @SuppressWarnings("Duplicates")
-    @Override
-    public void run() {
+    private synchronized void openStream(){
         try {
             outputStream = new ObjectOutputStream(m_socket.getOutputStream());
             inputStream = new ObjectInputStream(m_socket.getInputStream());
@@ -72,6 +70,12 @@ public class Connection implements Runnable {
                 System.err.println("Could not sleep");
             }
         }
+    }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public void run() {
+        openStream();
         while (isConnected) {
             Thread pingThread = new Thread(new Pinger());
             pingThread.start();
