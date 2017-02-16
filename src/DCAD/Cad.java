@@ -25,7 +25,7 @@ public class Cad {
      */
     private Cad(String[] args) {
     	if(args.length > 1) {
-    		mConnection = new ServerConnection(args[0], Integer.parseInt(args[1]));
+    		mConnection = new ServerConnection(gui, args[0], Integer.parseInt(args[1]));
     		gui.setServerConnection(mConnection);
         	new Thread(mConnection).start();
     	} else {

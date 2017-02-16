@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
 
@@ -28,13 +30,15 @@ public class ServerConnection implements Runnable {
 
 	private InetAddress mServerAddress;
 	private int mServerPort;
+	private GUI mGUI;
 	
 	/**
 	 * Constructs the ServerConnection, creating the address and setting the port.
 	 * @param frontEndAddress the address to the front end
 	 * @param frontEndPort the port to the front end
 	 */
-	public ServerConnection(String frontEndAddress, int frontEndPort) {
+	public ServerConnection(GUI gui, String frontEndAddress, int frontEndPort) {
+		mGUI = gui;
 		try {
 			mFrontEndAddress = InetAddress.getByName(frontEndAddress);
 		} catch (UnknownHostException e) { e.printStackTrace(); }
@@ -134,13 +138,16 @@ public class ServerConnection implements Runnable {
 				input = mIStream.readObject();
 			} catch (ClassNotFoundException | IOException e) {
 				mIsListening = false;
-				System.err.println("Received some weird shit from the server");
+				System.err.println("Received some weird shit from the server " + e.getMessage());
 			}
 			
 			// Handle the input and put to / update the GUI.
 			if(input instanceof GObject) {
-				GObject graphicalObject = (GObject)input;
-				// Convert to correct object etc
+				GObject gObject = (GObject)input;
+				// Add the shape to the GUI's list of objects. But need a reference to the GUI first. 
+				mGUI.addShape(gObject);
+			} else {
+				System.err.println("Got some unknown shit from the server");
 			}
 		}
 	}
@@ -149,9 +156,10 @@ public class ServerConnection implements Runnable {
 	 * Send a "create" or "delete" action to the server. This method should be called from the GUI.
 	 * @param gObject the graphical object to send to the server
 	 */
-	public void sendServerActions(GObject gObject) {
+	public void sendAction(GObject gObject) {
 		//TODO As a "delete action" would also send shit to the server, this function should handle that to.
-		// This function should be named "sendAction(GObject)" or something like that as it is called on the server obJ. 
+		// This function should be named "sendAction(GObject)" or something like that as it is called on the server obJ.
+		// Till exempel kan man skicka new ClientAction(Action, GObject) to this method. 
 		try {
 			mOStream.writeObject(gObject);
 		} catch (IOException e) {

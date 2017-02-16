@@ -120,7 +120,7 @@ public class GUI extends JFrame implements
     public void mouseReleased(MouseEvent e) {
 		if(current != null) {
 		    objectList.addLast(current);
-		    mServerConnection.sendServerActions(current);
+		    mServerConnection.sendAction(current);
 		    current = null;
 		}
 		repaint();
@@ -193,5 +193,13 @@ public class GUI extends JFrame implements
 	
 	public void setServerConnection(ServerConnection serverConnection) {
 		mServerConnection = serverConnection;
+	}
+	
+	/**
+	 * Add a GObject Shape to the GUI.
+	 * @param gObject
+	 */
+	public void addShape(GObject gObject) {
+		objectList.add(gObject);
 	}
 }
