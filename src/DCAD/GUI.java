@@ -22,6 +22,9 @@ import java.util.ListIterator;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import common.ClientWithServer.ClientActionMessage;
+import common.ClientWithServer.ClientActionMessage.ActionType;
+
 
 public class GUI extends JFrame implements
     WindowListener,ActionListener,MouseListener,MouseMotionListener {
@@ -112,7 +115,12 @@ public class GUI extends JFrame implements
 		// User clicks the right mouse button:
 		// undo an operation by removing the most recently added object.
 		if(e.getButton() == MouseEvent.BUTTON3 && objectList.size() > 0) {
-		    objectList.removeLast();
+			
+			// Get a reference to the removed object 
+		    GObject removedObject = objectList.removeLast();
+		    
+		    // Send the action to the server
+		    mServerConnection.sendActionMessage(new ClientActionMessage(ActionType.DELETE, removedObject));
 		}
 		repaint();
     }
@@ -120,7 +128,7 @@ public class GUI extends JFrame implements
     public void mouseReleased(MouseEvent e) {
 		if(current != null) {
 		    objectList.addLast(current);
-		    mServerConnection.sendAction(current);
+		    mServerConnection.sendActionMessage(new ClientActionMessage(ActionType.CREATE, current));
 		    current = null;
 		}
 		repaint();

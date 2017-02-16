@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
+import common.ClientWithServer.ClientActionMessage;
 
 /**
  * A class that represents the CAD client side connection. 
@@ -156,12 +157,12 @@ public class ServerConnection implements Runnable {
 	 * Send a "create" or "delete" action to the server. This method should be called from the GUI.
 	 * @param gObject the graphical object to send to the server
 	 */
-	public void sendAction(GObject gObject) {
+	public void sendActionMessage(ClientActionMessage clientActionMessage) {
 		//TODO As a "delete action" would also send shit to the server, this function should handle that to.
 		// This function should be named "sendAction(GObject)" or something like that as it is called on the server obJ.
 		// Till exempel kan man skicka new ClientAction(Action, GObject) to this method. 
 		try {
-			mOStream.writeObject(gObject);
+			mOStream.writeObject(clientActionMessage);
 		} catch (IOException e) {
 			System.err.println("Failed to send a graphical object to the server");
 		}
