@@ -17,6 +17,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import javax.swing.JButton;
@@ -42,7 +43,7 @@ public class GUI extends JFrame implements
     private GObject template = new GObject(Shape.OVAL, Color.RED, 363, 65, 25, 25);
     private GObject current = null;
 
-    private LinkedList<GObject> objectList = new LinkedList<GObject>();
+    //private LinkedList<GObject> objectList = new LinkedList<GObject>();
     
     private ServerConnection mServerConnection;
     
@@ -119,13 +120,19 @@ public class GUI extends JFrame implements
     public void mouseClicked(MouseEvent e) {
 		// User clicks the right mouse button:
 		// undo an operation by removing the most recently added object.
-		if(e.getButton() == MouseEvent.BUTTON3 && objectList.size() > 0) {
+		if(e.getButton() == MouseEvent.BUTTON3) {
 			
 			// Get a reference to the removed object 
-		    GObject removedObject = objectList.removeLast();
+		    //GObject removedObject = objectList.removeLast();
 		    
 		    // Send the action to the server
-		    mServerConnection.sendDeleteObject(removedObject);
+			GObject lastElement = null;
+			for (GObject el : eh.getExistingGObjects()) {
+				lastElement = el;
+			}
+			if (lastElement != null) {
+				mServerConnection.sendDeleteObject(lastElement);
+			}
 		}
 		repaint();
     }
@@ -138,7 +145,7 @@ public class GUI extends JFrame implements
     public void mouseReleased(MouseEvent e) {
 		if(current != null) {
 			// Add a new 
-		    objectList.addLast(current);
+		    //objectList.addLast(current);
 		    mServerConnection.sendCreateObject(current);
 		    current = null;
 		}
@@ -200,9 +207,9 @@ public class GUI extends JFrame implements
 			obj.draw(g);
 		}
 	
-		for(ListIterator<GObject> itr = objectList.listIterator(); itr.hasNext();) {
-			    itr.next().draw(g);
-		}
+		//for(ListIterator<GObject> itr = objectList.listIterator(); itr.hasNext();) {
+		//	    itr.next().draw(g);
+		//}
 		
 		if(current != null) {
 		    current.draw(g);

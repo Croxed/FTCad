@@ -114,6 +114,7 @@ public class Server {
 	}
 	
 	public synchronized void synchronizeClient(ClientConnection cc, int currentEventCount) {
+		System.out.println("Receieved request for events. Current number of events: " + eh.numEvents() + " requested num events: " + currentEventCount);
 		if (currentEventCount < eh.numEvents()) {
 			cc.send(eh.getEventsFrom(currentEventCount));
 		}

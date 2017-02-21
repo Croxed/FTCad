@@ -55,17 +55,17 @@ public class ServerConnection implements Runnable {
 		
 			initializeConnections();
 			
-			mPingThread = new Thread(new PingService());
-			mPingThread.start();
+			//mPingThread = new Thread(new PingService());
+			//mPingThread.start();
 			
 			// While the client is connected to the server
 			// Supply the clients actions to the server and listen for actions created from the server
 			mIsListening = true;
 			listenForServerActions();
 			
-			try {
-			 	mPingThread.join();
-			} catch (InterruptedException e1) { System.err.println("Failed to join the ping thread who cares"); }
+			//try {
+			// 	mPingThread.join();
+			//} catch (InterruptedException e1) { System.err.println("Failed to join the ping thread who cares"); }
 			
 			System.out.println("Disconnecting from the server");
 			
@@ -157,20 +157,23 @@ public class ServerConnection implements Runnable {
 			Object input = null;
 			try {
 				input = mIStream.readObject();
-			} catch (ClassNotFoundException | IOException e) {
-				mIsListening = false;
+				// Handle the input and put to / update the GUI.
+				if(input instanceof EventHandler) {
+					EventHandler eh = (EventHandler)input;
+					// Add the shape to the GUI's list of objects. But need a reference to the GUI first. 
+					mGUI.addEvents(eh);
+				} else if(input instanceof PingMessage) {
+					System.out.println("Received a ping message");
+				} else {
+					System.err.println("Got some unknown shit from the server");
+				}
+			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}
-			
-			// Handle the input and put to / update the GUI.
-			if(input instanceof EventHandler) {
-				EventHandler eh = (EventHandler)input;
-				// Add the shape to the GUI's list of objects. But need a reference to the GUI first. 
-				mGUI.addEvents(eh);
-			} else if(input instanceof PingMessage) {
-				System.out.println("Received a ping message");
-			} else {
-				System.err.println("Got some unknown shit from the server");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				mIsListening = false;
+				return;
 			}
 	 	}
 	}
