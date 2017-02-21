@@ -5,6 +5,7 @@ import java.net.*;
 
 import DCAD.GObject;
 import common.*;
+import common.ClientWithServer.EventRequestMessage;
 
 public class ClientConnection extends Thread {
 	private final Server server;
@@ -41,6 +42,9 @@ public class ClientConnection extends Thread {
 				} else if (inData instanceof DeleteEventMessage || inData instanceof GObject) {
 					System.out.println(inData.toString() + " received, sending it to all clients.");
 					server.addEvent(inData);
+				} else if (inData instanceof EventRequestMessage) {
+					EventRequestMessage msg = (EventRequestMessage) inData;
+					server.synchronizeClient(this, msg.getCurrentEventCount());
 				} else {
 					System.out.println("Object not recognized. " + inData.toString());
 				}

@@ -112,6 +112,12 @@ public class Server {
 			cc.send(singleEvent);
 		}
 	}
+	
+	public synchronized void synchronizeClient(ClientConnection cc, int currentEventCount) {
+		if (currentEventCount < eh.numEvents()) {
+			cc.send(eh.getEventsFrom(currentEventCount));
+		}
+	}
 
 	/**
 	 * @return port number the server is bound to

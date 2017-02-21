@@ -11,6 +11,7 @@ import common.DeleteEventMessage;
 import common.EventHandler;
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
+import common.ClientWithServer.EventRequestMessage;
 
 /**
  * A class that represents the CAD client side connection. 
@@ -140,6 +141,15 @@ public class ServerConnection implements Runnable {
 	 * Listens to the actions received from the server.
 	 */
 	private void listenForServerActions() {
+		try {
+			mOStream.writeObject(new EventRequestMessage(0));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			mIsListening = false;
+			return;
+		}
+		
 		System.out.println("Listening for server actions");
  		while(mIsListening) {
 			System.out.println("Waiting for input from the server");
@@ -149,7 +159,7 @@ public class ServerConnection implements Runnable {
 				input = mIStream.readObject();
 			} catch (ClassNotFoundException | IOException e) {
 				mIsListening = false;
-				System.err.println("Received some weird shit from the server " + e.getMessage());
+				e.printStackTrace();
 			}
 			
 			// Handle the input and put to / update the GUI.
