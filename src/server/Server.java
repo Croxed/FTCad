@@ -18,6 +18,8 @@ public class Server {
 	private int port;
 	
 	private ServerSocket socket;
+	
+	private EventHandler eh;
 
 
 	/**
@@ -87,12 +89,25 @@ public class Server {
 				// Wait for new connections and accept
 				client = socket.accept();
 				// Create a new ClientConnection thread for the new socket and start the thread
-				ClientConnection cc = new ClientConnection(client);
+				ClientConnection cc = new ClientConnection(this, client);
 				cc.start();
 			} catch (IOException e) {
 				System.out.println("Error when accepting connection");
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public synchronized void addClient(ClientConnection cc) {
+		System.out.println("Client added to client list");
+		clients.add(cc);
+	}
+	
+	public synchronized void addEvent(Object o) {
+		System.out.println(o.toString() + " added to events list and sent to clients");
+		eh.addEvent(o);
+		for (ClientConnection cc : clients) {
+			cc.send(o);
 		}
 	}
 

@@ -3,10 +3,11 @@ package server;
 import java.io.*;
 import java.net.*;
 
+import DCAD.GObject;
 import common.*;
 
 public class ClientConnection extends Thread {
-	//private final Server server;
+	private final Server server;
 	private final Socket socket;
 	
 	private final ObjectInputStream input; 
@@ -16,8 +17,8 @@ public class ClientConnection extends Thread {
 	 * Creates a new client connection
 	 * @throws IOException if input and output streams can't be created
 	 */
-	public ClientConnection(Socket _socket) throws IOException {
-		//server = _server;
+	public ClientConnection(Server _server, Socket _socket) throws IOException {
+		server = _server;
 		socket = _socket;
 		
 		input = new ObjectInputStream(socket.getInputStream());
@@ -28,6 +29,7 @@ public class ClientConnection extends Thread {
 	 * Thread main loop, used to listen to messages
 	 */
 	public void run() {
+		server.addClient(this);
 		System.out.println("Client connected " + socket.getInetAddress().toString() + ":" + socket.getPort());
 		while(true) {
 			try {
@@ -36,8 +38,10 @@ public class ClientConnection extends Thread {
 				// A message has arrived, try to parse and handle it
 				if (inData instanceof PingMessage) {
 					System.out.println("Ping received");
+				} else if (inData instanceof DeleteEventMessage || inData instanceof GObject) {
+					server.addEvent(inData);
 				} else {
-					System.out.println("Object not recognized");
+					System.out.println("Object not recognized. " + inData.toString());
 				}
 			} catch (ClassNotFoundException e1) {
 				System.out.println("Object not recognized");
@@ -47,6 +51,15 @@ public class ClientConnection extends Thread {
 				try { socket.close(); } catch (IOException e2) {}
 				return;
 			}
+		}
+	}
+	
+	public void send(Object o) {
+		try {
+			output.writeObject(o);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
