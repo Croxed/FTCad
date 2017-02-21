@@ -52,6 +52,7 @@ public class ServerConnection implements Runnable {
 	public void run() {
 		
 		while(true) {
+			mGUI.removeEvents();
 		
 			initializeConnections();
 			
@@ -141,15 +142,6 @@ public class ServerConnection implements Runnable {
 	 * Listens to the actions received from the server.
 	 */
 	private void listenForServerActions() {
-		try {
-			mOStream.writeObject(new EventRequestMessage(0));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			mIsListening = false;
-			return;
-		}
-		
 		System.out.println("Listening for server actions");
  		while(mIsListening) {
 			System.out.println("Waiting for input from the server");

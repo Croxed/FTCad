@@ -230,8 +230,13 @@ public class GUI extends JFrame implements
 	 * @param gObject
 	 */
 	
-	public void addEvents(EventHandler extraEh) {
+	public synchronized void addEvents(EventHandler extraEh) {
 		eh.addEvents(extraEh);
+		repaint();
+	}
+
+	public synchronized void removeEvents() {
+		eh = new EventHandler();
 		repaint();
 	}
 }

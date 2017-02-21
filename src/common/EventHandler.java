@@ -41,12 +41,4 @@ public class EventHandler implements Serializable {
 	public int numEvents() {
 		return events.size();
 	}
-
-	public EventHandler getEventsFrom(int currentEventCount) {
-		EventHandler newEh = new EventHandler();
-		for (int i = currentEventCount; i < events.size(); i++) {
-			newEh.addEvent(events.get(i));
-		}
-		return newEh;
-	}
 }
