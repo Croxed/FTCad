@@ -7,7 +7,7 @@ public class DeleteEventMessage extends Message {
 	
     private UUID mUID;
     
-	DeleteEventMessage(UUID uid) {
+	public DeleteEventMessage(UUID uid) {
 		mUID = uid;
 	}
 

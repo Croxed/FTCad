@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import common.DeleteEventMessage;
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
 
@@ -156,7 +158,7 @@ public class ServerConnection implements Runnable {
 	 */
 	public void sendDeleteObject(GObject deletedGObject) {
 		try {
-			mOStream.writeObject(deletedGObject);
+			mOStream.writeObject(new DeleteEventMessage(deletedGObject.getUID()));
 		} catch (IOException e) {
 			System.err.println("Failed to send a deleted object.");
 		}
