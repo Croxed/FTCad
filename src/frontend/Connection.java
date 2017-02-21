@@ -61,21 +61,20 @@ public class Connection implements Runnable {
                 m_portnr = msg.getPortNr();
                 System.out.println("A server connected!");
                 connectedServer.add(this);
-                outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(!isPrimary));
-                isPrimary = true;
+                outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(m_frontEnd.getPrimary() == this));
             }
             // Determines if the message is from a client
             else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
-                if (connectedServer.size() >= 1) {
-                    Connection serverConnection = connectedServer.lastElement();
+                    Connection serverConnection = m_frontEnd.getPrimary();
                     System.out.println("A client connected!");
-                    InetAddress address = serverConnection.getAddress();
-                    int port = serverConnection.getPort();
-                    System.out.println(address.toString() + ":" + port);
-                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
-                } else {
-                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
-                }
+                    if (serverConnection == null)
+                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
+                    else {
+                        InetAddress address = serverConnection.getAddress();
+                        int port = serverConnection.getPort();
+                        System.out.println(address.toString() + ":" + port);
+                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
+                    }
                 isConnected = false;
             }
         } catch (IOException | ClassNotFoundException e) {

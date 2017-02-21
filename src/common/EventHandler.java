@@ -31,4 +31,8 @@ public class EventHandler {
 		
 		return results;
 	}
+	
+	public int numEvents() {
+		return events.size();
+	}
 }
