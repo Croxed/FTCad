@@ -19,15 +19,12 @@ import common.ClientWithFrontEnd.ConnectionRespondMessage;
  */
 public class ServerConnection implements Runnable {
 
-	private boolean mIsConnected = false;
-	private volatile boolean mIsListening = false;
-	
+	private volatile boolean mIsListening = false;	
 	private Socket mSocket;
 	private ObjectOutputStream mOStream;
 	private ObjectInputStream mIStream;
 	private InetAddress mFrontEndAddress;
 	private int mFrontEndPort = -1;
-
 	private InetAddress mServerAddress;
 	private int mServerPort;
 	private GUI mGUI;
