@@ -19,7 +19,6 @@ public class Connection implements Runnable {
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private volatile int m_portnr;
-    private volatile boolean isPrimary;
     private volatile boolean isConnected;
 
     public Connection(FrontEnd frontEnd, Socket socket) {
@@ -61,7 +60,8 @@ public class Connection implements Runnable {
                 m_portnr = msg.getPortNr();
                 System.out.println("A server connected!");
                 connectedServer.add(this);
-                outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(m_frontEnd.getPrimary() == this));
+                Connection primary = m_frontEnd.getPrimary();
+                outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(primary == this, primary.getAddress(), primary.getPort()));
             }
             // Determines if the message is from a client
             else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
@@ -104,8 +104,9 @@ public class Connection implements Runnable {
                 try {
                     m_socket.setSoTimeout(5000);
                     input = inputStream.readObject();
-                    if(input instanceof PingMessage)
+                    if(input instanceof PingMessage) {
                         System.out.print(".");
+                    }
                 } catch (IOException | ClassNotFoundException e) {
                     isConnected = false;
                 }
