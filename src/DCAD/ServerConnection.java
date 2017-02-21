@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import common.PingMessage;
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
 
@@ -29,6 +31,7 @@ public class ServerConnection implements Runnable {
 	private InetAddress mServerAddress;
 	private int mServerPort;
 	private GUI mGUI;
+	private Thread mPingThread;
 	
 	/**
 	 * Constructs the ServerConnection, creating the address and setting the port.
@@ -51,12 +54,19 @@ public class ServerConnection implements Runnable {
 		
 		initializeConnections();
 		
+		mPingThread = new Thread(new PingService());
+		mPingThread.start();
+		
 		while(mIsConnected) {
 			// While the client is connected to the server
 			// Supply the clients actions to the server and listen for actions created from the server
 			mIsListening = true;
 			listenForServerActions();
 		}
+		
+		try {
+		 	mPingThread.join();
+		} catch (InterruptedException e1) {System.err.println("Failed to join the ping thread who cares");}
 		
 		System.out.println("Disconnecting from the server");
 		try {
@@ -70,7 +80,9 @@ public class ServerConnection implements Runnable {
 	}
 
 	/**
-	 * Initializes all connections to the server. 
+	 * Attempts to the connect to the front end. 
+	 * When connected, attempts to receive connection details from the front end. 
+	 * Then, disconnects from the front end and connects to the specified primary server. 
 	 */
 	private void initializeConnections() {
 		
@@ -128,7 +140,7 @@ public class ServerConnection implements Runnable {
 	 */
 	private void listenForServerActions() {
 		System.out.println("Listening for server actions");
-		while(mIsListening) {
+ 		while(mIsListening) {
 			System.out.println("Waiting for input from the server");
 			// Receive some input from the server
 			Object input = null;
@@ -144,10 +156,12 @@ public class ServerConnection implements Runnable {
 				GObject gObject = (GObject)input;
 				// Add the shape to the GUI's list of objects. But need a reference to the GUI first. 
 				mGUI.addShape(gObject);
+			} else if(input instanceof PingMessage) {
+				System.out.println("Received a ping message");
 			} else {
 				System.err.println("Got some unknown shit from the server");
 			}
-		}
+	 	}
 	}
 	
 	/**
@@ -229,5 +243,25 @@ public class ServerConnection implements Runnable {
 		mSocket.close();
 		mIsConnected = false;
 	}
-
+	
+	/**
+	 * Responsible for sending Ping requests to the server. 
+	 * @author mattiasolsson
+	 *
+	 */
+	private class PingService implements Runnable {
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					mOStream.writeObject(new PingMessage());
+					System.out.println("Sending a ping");
+				} catch (IOException e1) { System.err.println("Failed to send a ping message."); }
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {}
+			}
+		}
+	}
+	
 }
