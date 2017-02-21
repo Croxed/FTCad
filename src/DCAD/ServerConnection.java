@@ -187,6 +187,7 @@ public class ServerConnection implements Runnable {
 		try {
 			mOStream.writeObject(createdGObject);
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.err.println("Failed to send a ClientActionMessage to the server");
 		}
 	}

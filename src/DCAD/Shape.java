@@ -5,8 +5,14 @@
 
 package DCAD;
 
-final class Shape {
-    private String type;
+import java.io.Serializable;
+
+final class Shape implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String type;
 
     private Shape(String type) {
     	this.type = type;
