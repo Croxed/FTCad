@@ -51,26 +51,27 @@ public class ServerConnection implements Runnable {
 		
 		while(true) {
 		
-		initializeConnections();
-		
-		mPingThread = new Thread(new PingService());
-		mPingThread.start();
-		
-		// While the client is connected to the server
-		// Supply the clients actions to the server and listen for actions created from the server
-		mIsListening = true;
-		listenForServerActions();
-		
-		try {
-		 	mPingThread.join();
-		} catch (InterruptedException e1) { System.err.println("Failed to join the ping thread who cares"); }
-		
-		System.out.println("Disconnecting from the server");
-		try {
-			disconnectSocket();
-		} catch (IOException e) {
-			System.err.println("Could not disconnect from the server");
-		}
+			initializeConnections();
+			
+			mPingThread = new Thread(new PingService());
+			mPingThread.start();
+			
+			// While the client is connected to the server
+			// Supply the clients actions to the server and listen for actions created from the server
+			mIsListening = true;
+			listenForServerActions();
+			
+			try {
+			 	mPingThread.join();
+			} catch (InterruptedException e1) { System.err.println("Failed to join the ping thread who cares"); }
+			
+			System.out.println("Disconnecting from the server");
+			
+			try {
+				disconnectSocket();
+			} catch (IOException e) {
+				System.err.println("Could not disconnect from the server");
+			}
 		
 		}
 		
@@ -194,7 +195,6 @@ public class ServerConnection implements Runnable {
 		mSocket = new Socket(mServerAddress, mServerPort);
 		mOStream = new ObjectOutputStream(mSocket.getOutputStream());
 		mIStream = new ObjectInputStream(mSocket.getInputStream());
-		mIsConnected = true;
 	}
 
 	/**
@@ -239,7 +239,6 @@ public class ServerConnection implements Runnable {
 		mOStream.close();
 		mIStream.close();
 		mSocket.close();
-		mIsConnected = false;
 	}
 	
 	/**
