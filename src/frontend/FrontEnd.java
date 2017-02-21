@@ -12,6 +12,7 @@ public class FrontEnd {
     private ServerSocket m_serverSocket;
     private Socket m_socket;
     private volatile Vector<Connection> m_connectedServers = new Vector<>();
+    private Connection m_PrimaryServer;
 
     /**
      * Create a front end, where the port number is the port where the front end should listen for
@@ -65,6 +66,16 @@ public class FrontEnd {
                 e.printStackTrace();
             }
         }
+    }
 
+    Connection getPrimary(){
+        if(m_PrimaryServer == null){
+            pickPrimary();
+        }
+        return m_PrimaryServer;
+    }
+
+    private void pickPrimary(){
+        m_PrimaryServer = m_connectedServers.size() != 0 ? m_connectedServers.firstElement() : null;
     }
 }
