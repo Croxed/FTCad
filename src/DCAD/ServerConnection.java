@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import common.PingMessage;
 import common.DeleteEventMessage;
+import common.EventHandler;
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
 
@@ -152,10 +153,10 @@ public class ServerConnection implements Runnable {
 			}
 			
 			// Handle the input and put to / update the GUI.
-			if(input instanceof GObject) {
-				GObject gObject = (GObject)input;
+			if(input instanceof EventHandler) {
+				EventHandler eh = (EventHandler)input;
 				// Add the shape to the GUI's list of objects. But need a reference to the GUI first. 
-				mGUI.addShape(gObject);
+				mGUI.addEvents(eh);
 			} else if(input instanceof PingMessage) {
 				System.out.println("Received a ping message");
 			} else {
@@ -170,7 +171,6 @@ public class ServerConnection implements Runnable {
 	 */
 	public void sendDeleteObject(GObject deletedGObject) {
 		try {
-			mOStream.writeObject(deletedGObject);
 			mOStream.writeObject(new DeleteEventMessage(deletedGObject.getUID()));
 		} catch (IOException e) {
 			System.err.println("Failed to send a deleted object.");

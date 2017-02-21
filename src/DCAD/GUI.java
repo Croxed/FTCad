@@ -22,6 +22,8 @@ import java.util.ListIterator;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import common.EventHandler;
+
 public class GUI extends JFrame implements
     WindowListener,ActionListener,MouseListener,MouseMotionListener {
 
@@ -43,6 +45,8 @@ public class GUI extends JFrame implements
     private LinkedList<GObject> objectList = new LinkedList<GObject>();
     
     private ServerConnection mServerConnection;
+    
+    private EventHandler eh = new EventHandler();
 	
     public GUI(int xpos, int ypos) {
         setSize(xpos,ypos);
@@ -191,6 +195,10 @@ public class GUI extends JFrame implements
 		g.fillRect(0, 60, getSize().width, getSize().height - 60);
 	
 		template.draw(g);
+		
+		for (GObject obj : eh.getExistingGObjects()) {
+			obj.draw(g);
+		}
 	
 		for(ListIterator<GObject> itr = objectList.listIterator(); itr.hasNext();) {
 			    itr.next().draw(g);
@@ -214,7 +222,9 @@ public class GUI extends JFrame implements
 	 * Add a GObject Shape to the GUI.
 	 * @param gObject
 	 */
-	public void addShape(GObject gObject) {
-		objectList.add(gObject);
+	
+	public void addEvents(EventHandler extraEh) {
+		eh.addEvents(extraEh);
+		repaint();
 	}
 }

@@ -1,12 +1,18 @@
 package common;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import DCAD.GObject;
 
-public class EventHandler {
+public class EventHandler implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Object> events = new ArrayList<Object>();
 	
 	public void addEvents(EventHandler eh) {
@@ -17,7 +23,7 @@ public class EventHandler {
 		events.add(o);
 	}
 	
-	public LinkedHashMap<UUID, GObject> getExistingGObjects() {
+	public Collection<GObject> getExistingGObjects() {
 		LinkedHashMap<UUID, GObject> results = new LinkedHashMap<UUID, GObject>();
 		
 		for (Object event : events) {
@@ -29,7 +35,7 @@ public class EventHandler {
 			}
 		}
 		
-		return results;
+		return results.values();
 	}
 	
 	public int numEvents() {

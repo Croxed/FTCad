@@ -106,8 +106,10 @@ public class Server {
 	public synchronized void addEvent(Object o) {
 		System.out.println(o.toString() + " added to events list and sent to clients");
 		eh.addEvent(o);
+		EventHandler singleEvent = new EventHandler();
+		singleEvent.addEvent(o);
 		for (ClientConnection cc : clients) {
-			cc.send(o);
+			cc.send(singleEvent);
 		}
 	}
 
