@@ -19,7 +19,7 @@ public class Server {
 	
 	private ServerSocket socket;
 	
-	private EventHandler eh;
+	private EventHandler eh = new EventHandler();
 
 
 	/**
