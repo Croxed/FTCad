@@ -20,7 +20,7 @@ import common.ClientWithFrontEnd.ConnectionRespondMessage;
 public class ServerConnection implements Runnable {
 
 	private boolean mIsConnected = false;
-	private boolean mIsListening = false;
+	private volatile boolean mIsListening = false;
 	
 	private Socket mSocket;
 	private ObjectOutputStream mOStream;
@@ -59,14 +59,14 @@ public class ServerConnection implements Runnable {
 		mPingThread = new Thread(new PingService());
 		mPingThread.start();
 		
-			// While the client is connected to the server
-			// Supply the clients actions to the server and listen for actions created from the server
-			mIsListening = true;
-			listenForServerActions();
+		// While the client is connected to the server
+		// Supply the clients actions to the server and listen for actions created from the server
+		mIsListening = true;
+		listenForServerActions();
 		
 		try {
 		 	mPingThread.join();
-		} catch (InterruptedException e1) {System.err.println("Failed to join the ping thread who cares");}
+		} catch (InterruptedException e1) { System.err.println("Failed to join the ping thread who cares"); }
 		
 		System.out.println("Disconnecting from the server");
 		try {
@@ -186,9 +186,7 @@ public class ServerConnection implements Runnable {
 	public void sendCreateObject(GObject createdGObject) {
 		try {
 			mOStream.writeObject(createdGObject);
-		} catch (IOException e) {
-			System.err.println("Failed to send a ClientActionMessage to the server");
-		}
+		} catch (IOException e) { System.err.println("Failed to send a create GObject to the server"); }
 	}
 
 	/**
@@ -255,14 +253,14 @@ public class ServerConnection implements Runnable {
 	private class PingService implements Runnable {
 		@Override
 		public void run() {
-			while(true) {
+			while(mIsListening) {
 				try {
 					mOStream.writeObject(new PingMessage());
 					System.out.println("Sending a ping");
 				} catch (IOException e1) { System.err.println("Failed to send a ping message."); }
 				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {}
+					Thread.sleep(1000);
+				} catch (InterruptedException e) { System.err.println("Failed to sleep"); }
 			}
 		}
 	}
