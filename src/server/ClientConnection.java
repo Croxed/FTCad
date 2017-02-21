@@ -39,6 +39,7 @@ public class ClientConnection extends Thread {
 				if (inData instanceof PingMessage) {
 					System.out.println("Ping received");
 				} else if (inData instanceof DeleteEventMessage || inData instanceof GObject) {
+					System.out.println(inData.toString() + " received, sending it to all clients.");
 					server.addEvent(inData);
 				} else {
 					System.out.println("Object not recognized. " + inData.toString());

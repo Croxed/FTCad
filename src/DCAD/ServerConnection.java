@@ -52,17 +52,17 @@ public class ServerConnection implements Runnable {
 	@Override
 	public void run() {
 		
+		while(true) {
+		
 		initializeConnections();
 		
 		mPingThread = new Thread(new PingService());
 		mPingThread.start();
 		
-		while(mIsConnected) {
 			// While the client is connected to the server
 			// Supply the clients actions to the server and listen for actions created from the server
 			mIsListening = true;
 			listenForServerActions();
-		}
 		
 		try {
 		 	mPingThread.join();
@@ -73,6 +73,8 @@ public class ServerConnection implements Runnable {
 			disconnectSocket();
 		} catch (IOException e) {
 			System.err.println("Could not disconnect from the server");
+		}
+		
 		}
 		
 		// Maybe want to connect to the front end again or something.
