@@ -1,6 +1,4 @@
-package common;
-
-import DCAD.GObject;
+package common.ClientWithServer;
 
 import java.io.Serializable;
 import java.util.ArrayList;

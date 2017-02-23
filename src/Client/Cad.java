@@ -2,7 +2,7 @@
  * @author brom
  */
 
-package DCAD;
+package Client;
 
 public class Cad {
 

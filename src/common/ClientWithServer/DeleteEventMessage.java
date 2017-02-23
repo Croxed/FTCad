@@ -1,4 +1,6 @@
-package common;
+package common.ClientWithServer;
+
+import common.Message;
 
 import java.util.UUID;
 

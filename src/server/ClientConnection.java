@@ -1,7 +1,7 @@
 package server;
 
-import DCAD.GObject;
-import common.DeleteEventMessage;
+import common.ClientWithServer.GObject;
+import common.ClientWithServer.DeleteEventMessage;
 import common.PingMessage;
 
 import java.io.IOException;

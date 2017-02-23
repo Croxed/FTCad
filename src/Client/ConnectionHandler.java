@@ -1,8 +1,10 @@
-package DCAD;
+package Client;
 
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
-import common.DeleteEventMessage;
+import common.ClientWithServer.GObject;
+import common.ClientWithServer.ServerConnection;
+import common.ClientWithServer.DeleteEventMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

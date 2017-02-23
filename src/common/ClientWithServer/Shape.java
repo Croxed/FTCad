@@ -2,11 +2,11 @@
  * @author brom
  */
 
-package DCAD;
+package common.ClientWithServer;
 
 import java.io.Serializable;
 
-final class Shape implements Serializable {
+public final class Shape implements Serializable {
     /**
      *
      */

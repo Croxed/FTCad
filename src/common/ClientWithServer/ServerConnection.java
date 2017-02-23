@@ -1,7 +1,7 @@
-package DCAD;
+package common.ClientWithServer;
 
-import common.EventHandler;
-import common.EventReceiver;
+import common.ClientWithServer.EventHandler;
+import common.ClientWithServer.EventReceiver;
 import common.PingMessage;
 
 import java.io.IOException;

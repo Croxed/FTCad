@@ -2,7 +2,7 @@
  * @author brom
  */
 
-package DCAD;
+package common.ClientWithServer;
 
 
 import java.awt.*;
@@ -20,7 +20,7 @@ public class GObject implements Serializable {
      * This is always very neccesary.
      */
     private static final long serialVersionUID = 1L;
-    private Shape s;
+    private common.ClientWithServer.Shape s;
     private Color c;
     private int x, y, width, height;
     private UUID mUID;
@@ -28,7 +28,7 @@ public class GObject implements Serializable {
     // graphics context in which the object is to be drawn - NOT the top left corner
     // of the GUI window.
 
-    public GObject(Shape s, Color c, int x, int y, int width, int height) {
+    public GObject(common.ClientWithServer.Shape s, Color c, int x, int y, int width, int height) {
         this.s = s;
         this.c = c;
         this.x = x;
@@ -52,11 +52,11 @@ public class GObject implements Serializable {
         this.height = height;
     }
 
-    public Shape getShape() {
+    public common.ClientWithServer.Shape getShape() {
         return s;
     }
 
-    public void setShape(Shape s) {
+    public void setShape(common.ClientWithServer.Shape s) {
         this.s = s;
     }
 
@@ -95,15 +95,15 @@ public class GObject implements Serializable {
         // Use string comparison to allow comparison of shapes even if the objects
         // have different nodes of origin
 
-        if (s.toString().compareTo(Shape.OVAL.toString()) == 0) {
+        if (s.toString().compareTo(common.ClientWithServer.Shape.OVAL.toString()) == 0) {
             g.drawOval(drawX, drawY, drawWidth, drawHeight);
-        } else if (s.toString().compareTo(Shape.RECTANGLE.toString()) == 0) {
+        } else if (s.toString().compareTo(common.ClientWithServer.Shape.RECTANGLE.toString()) == 0) {
             g.drawRect(drawX, drawY, drawWidth, drawHeight);
-        } else if (s.toString().compareTo(Shape.LINE.toString()) == 0) {
+        } else if (s.toString().compareTo(common.ClientWithServer.Shape.LINE.toString()) == 0) {
             g.drawLine(x, y, x + width, y + height);
-        } else if (s.toString().compareTo(Shape.FILLED_RECTANGLE.toString()) == 0) {
+        } else if (s.toString().compareTo(common.ClientWithServer.Shape.FILLED_RECTANGLE.toString()) == 0) {
             g.fillRect(drawX, drawY, drawWidth, drawHeight);
-        } else if (s.toString().compareTo(Shape.FILLED_OVAL.toString()) == 0) {
+        } else if (s.toString().compareTo(common.ClientWithServer.Shape.FILLED_OVAL.toString()) == 0) {
             g.fillOval(drawX, drawY, drawWidth, drawHeight);
         }
     }

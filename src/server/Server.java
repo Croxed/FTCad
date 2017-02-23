@@ -1,14 +1,14 @@
 package server;
 
-import common.EventHandler;
-import common.EventReceiver;
+import common.ClientWithServer.EventHandler;
+import common.ClientWithServer.EventReceiver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import DCAD.ServerConnection;
+import common.ClientWithServer.ServerConnection;
 
 public class Server implements EventReceiver {
     private ArrayList<ClientConnection> clients = new ArrayList<ClientConnection>(); // Keep a list of the clients

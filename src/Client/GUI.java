@@ -3,11 +3,10 @@
  * @author brom
  */
 
-package DCAD;
+package Client;
 
 
-import common.EventHandler;
-import common.EventReceiver;
+import common.ClientWithServer.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +27,7 @@ public class GUI extends JFrame implements
     JButton whiteButton = new JButton("White");
     JButton pinkButton = new JButton("Pink");
 
-    private GObject template = new GObject(Shape.OVAL, Color.RED, 363, 65, 25, 25);
+    private GObject template = new GObject(common.ClientWithServer.Shape.OVAL, Color.RED, 363, 65, 25, 25);
     private GObject current = null;
 
     //private LinkedList<GObject> objectList = new LinkedList<GObject>();
@@ -153,19 +152,19 @@ public class GUI extends JFrame implements
     // ActionListener methods
     public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == ovalButton) {
-		    template.setShape(Shape.OVAL);
+		    template.setShape(common.ClientWithServer.Shape.OVAL);
 		}
 		else if(e.getSource() == rectangleButton) {
-		    template.setShape(Shape.RECTANGLE);
+		    template.setShape(common.ClientWithServer.Shape.RECTANGLE);
 		}
 		else if(e.getSource() == lineButton) {
-		    template.setShape(Shape.LINE);
+		    template.setShape(common.ClientWithServer.Shape.LINE);
 		}
 		else if(e.getSource() == filledOvalButton) {
-		    template.setShape(Shape.FILLED_OVAL);
+		    template.setShape(common.ClientWithServer.Shape.FILLED_OVAL);
 		}
 		else if(e.getSource() == filledRectangleButton) {
-		    template.setShape(Shape.FILLED_RECTANGLE);
+		    template.setShape(common.ClientWithServer.Shape.FILLED_RECTANGLE);
 		}
 		else if(e.getSource() == redButton) {
 		    template.setColor(Color.RED);
