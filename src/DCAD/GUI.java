@@ -6,25 +6,15 @@
 package DCAD;
 
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-
 import common.EventHandler;
 import common.EventReceiver;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
 public class GUI extends JFrame implements
-    WindowListener,ActionListener,MouseListener,MouseMotionListener,EventReceiver {
+    WindowListener,ActionListener,MouseListener,MouseMotionListener, EventReceiver {
 
 	private static final long serialVersionUID = 1L;
 	JButton ovalButton = new JButton("Oval");

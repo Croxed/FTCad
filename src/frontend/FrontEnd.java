@@ -14,6 +14,7 @@ public class FrontEnd {
     /**
      * Create a front end, where the port number is the port where the front end should listen for
      * new connections.
+     *
      * @param portNumber Port number to listen on
      * @throws IOException If front end could not create a new ServerSocket.
      */
@@ -40,6 +41,7 @@ public class FrontEnd {
 
     /**
      * Get a vector of connected servers.
+     *
      * @return Vector with connected servers.
      */
     public synchronized Vector<Connection> getConnectedServers() {
@@ -65,8 +67,8 @@ public class FrontEnd {
         }
     }
 
-    void removeServer(Connection serverConnection){
-        if(m_PrimaryServer == serverConnection){
+    void removeServer(Connection serverConnection) {
+        if (m_PrimaryServer == serverConnection) {
             pickPrimary();
             try {
                 m_PrimaryServer.sendIsPrimary();
@@ -77,14 +79,14 @@ public class FrontEnd {
         m_connectedServers.remove(serverConnection);
     }
 
-    Connection getPrimary(){
-        if(m_PrimaryServer == null){
+    Connection getPrimary() {
+        if (m_PrimaryServer == null) {
             pickPrimary();
         }
         return m_PrimaryServer;
     }
 
-    private void pickPrimary(){
+    private void pickPrimary() {
         m_PrimaryServer = m_connectedServers.size() != 0 ? m_connectedServers.firstElement() : null;
     }
 }

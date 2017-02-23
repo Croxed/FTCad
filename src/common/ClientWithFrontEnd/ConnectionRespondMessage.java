@@ -7,7 +7,8 @@ import java.net.InetAddress;
 public class ConnectionRespondMessage extends Message {
     private InetAddress address;
     private int port;
-    public ConnectionRespondMessage(InetAddress address, int port){
+
+    public ConnectionRespondMessage(InetAddress address, int port) {
         this.address = address;
         this.port = port;
     }

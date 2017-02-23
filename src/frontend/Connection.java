@@ -27,17 +27,19 @@ public class Connection implements Runnable {
 
     /**
      * Get connection of the current socket
+     *
      * @return Address of connection
      */
-    public synchronized InetAddress getAddress(){
+    public synchronized InetAddress getAddress() {
         return m_socket.getInetAddress();
     }
 
     /**
      * Get port of the server that connected to front end
+     *
      * @return
      */
-    public synchronized int getPort(){
+    public synchronized int getPort() {
         return m_portnr;
     }
 
@@ -50,7 +52,7 @@ public class Connection implements Runnable {
      * If a server connected, add it to the list of connected servers in front end, and determine if it should be primary server.
      * It a client connected, send back the information about the primary server.
      */
-    private synchronized void openStream(){
+    private synchronized void openStream() {
         try {
             outputStream = new ObjectOutputStream(m_socket.getOutputStream());
             inputStream = new ObjectInputStream(m_socket.getInputStream());
@@ -67,16 +69,16 @@ public class Connection implements Runnable {
             }
             // Determines if the message is from a client
             else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
-                    Connection serverConnection = m_frontEnd.getPrimary();
-                    System.out.println("A client connected!");
-                    if (serverConnection == null)
-                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
-                    else {
-                        InetAddress address = serverConnection.getAddress();
-                        int port = serverConnection.getPort();
-                        System.out.println(address.toString() + ":" + port);
-                        outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
-                    }
+                Connection serverConnection = m_frontEnd.getPrimary();
+                System.out.println("A client connected!");
+                if (serverConnection == null)
+                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
+                else {
+                    InetAddress address = serverConnection.getAddress();
+                    int port = serverConnection.getPort();
+                    System.out.println(address.toString() + ":" + port);
+                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
+                }
                 isConnected = false;
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -106,14 +108,14 @@ public class Connection implements Runnable {
                 try {
                     m_socket.setSoTimeout(5000);
                     input = inputStream.readObject();
-                    if(input instanceof PingMessage) {
+                    if (input instanceof PingMessage) {
                         System.out.print(".");
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     isConnected = false;
                 }
             }
-            try{
+            try {
                 System.out.println("Not connected");
                 pingThread.interrupt();
                 pingThread.join();
@@ -130,7 +132,7 @@ public class Connection implements Runnable {
      * Does this every second, thus Thread.sleep(1000).
      */
     @SuppressWarnings("Duplicates")
-    private class Pinger implements Runnable{
+    private class Pinger implements Runnable {
         @Override
         public void run() {
             while (isConnected) {
@@ -140,7 +142,7 @@ public class Connection implements Runnable {
                 } catch (IOException e) {
                     System.err.println("Could not ping");
                 }
-                try{
+                try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     System.err.println("Could not sleep");
