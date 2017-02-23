@@ -65,7 +65,7 @@ public class ServerConnection {
                     // Add the shape to the GUI's list of objects. But need a reference to the GUI first.
                     mEr.addEvents(eh);
                 } else if (input instanceof PingMessage) {
-                    System.out.println("Received a ping message");
+                    System.out.print(".");
                 } else {
                     System.err.println("Got some unknown shit from the server");
                 }

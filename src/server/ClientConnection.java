@@ -15,6 +15,8 @@ public class ClientConnection extends Thread {
 
     private final ObjectInputStream input;
     private final ObjectOutputStream output;
+    
+    private boolean isConnected;
 
     /**
      * Creates a new client connection
@@ -35,28 +37,42 @@ public class ClientConnection extends Thread {
     public void run() {
         server.addClient(this);
         System.out.println("Client connected " + socket.getInetAddress().toString() + ":" + socket.getPort());
+        isConnected = true;
+
+        Thread ping = new Thread(new Pinger());
+        ping.start();
+        
         while (true) {
             try {
                 Object inData = input.readObject();
 
                 // A message has arrived, try to parse and handle it
                 if (inData instanceof PingMessage) {
-                    System.out.println("Ping received");
+                    System.out.print(".");
                 } else if (inData instanceof DeleteEventMessage || inData instanceof GObject) {
                     System.out.println(inData.toString() + " received, sending it to all clients.");
                     server.addEvent(inData);
                 } else {
                     System.out.println("Object not recognized. " + inData.toString());
                 }
-            } catch (ClassNotFoundException e1) {
+            } catch (ClassNotFoundException e) {
                 System.out.println("Object not recognized");
-                e1.printStackTrace();
+                e.printStackTrace();
             } catch (IOException e) {
                 // Can't receive on socket, client has disconnected
+            	
+                System.out.println("Client disconnected " + socket.getInetAddress().toString() + ":" + socket.getPort());
+                isConnected = false;
+                try {
+                    ping.interrupt();
+                    ping.join();
+                } catch (InterruptedException e2) {
+                    e.printStackTrace();
+                }
                 try {
                     socket.close();
-                } catch (IOException e2) {
-                }
+                } catch (IOException e2) { }
+                
                 return;
             }
         }
@@ -66,9 +82,29 @@ public class ClientConnection extends Thread {
         try {
             output.writeObject(o);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
+
+    /**
+     * Keep pinging the client
+     */
+    private class Pinger implements Runnable {
+        public void run() {
+            while (isConnected) {
+                try {
+                    output.writeObject(new PingMessage());
+                    System.out.print("!");
+                } catch (IOException e) {
+                    System.err.println("Could not ping");
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println("Could not sleep");
+                }
+            }
+        }
+    }
 }
