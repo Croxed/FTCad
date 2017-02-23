@@ -36,7 +36,7 @@ public class ClientConnection extends Thread {
      */
     public void run() {
         server.addClient(this);
-        System.out.println("Client connected " + socket.getInetAddress().toString() + ":" + socket.getPort());
+        System.out.println("client connected " + socket.getInetAddress().toString() + ":" + socket.getPort());
         isConnected = true;
 
         Thread ping = new Thread(new Pinger());
@@ -61,7 +61,7 @@ public class ClientConnection extends Thread {
             } catch (IOException e) {
                 // Can't receive on socket, client has disconnected
             	
-                System.out.println("Client disconnected " + socket.getInetAddress().toString() + ":" + socket.getPort());
+                System.out.println("client disconnected " + socket.getInetAddress().toString() + ":" + socket.getPort());
                 isConnected = false;
                 try {
                     ping.interrupt();

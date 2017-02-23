@@ -3,7 +3,7 @@
  * @author brom
  */
 
-package Client;
+package client;
 
 
 import common.ClientWithServer.*;

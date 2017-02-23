@@ -115,7 +115,7 @@ public class Server implements EventReceiver {
     }
 
     public synchronized void addClient(ClientConnection cc) {
-        System.out.println("Client added to client list");
+        System.out.println("client added to client list");
         if (eh.numEvents() > 0) {
             cc.send(eh);
             System.out.println("Sent existing events to client");

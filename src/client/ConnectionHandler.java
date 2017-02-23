@@ -1,4 +1,4 @@
-package Client;
+package client;
 
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
