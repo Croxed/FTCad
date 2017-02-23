@@ -16,10 +16,9 @@ import common.ClientWithServer.EventRequestMessage;
 /**
  * A class that represents the CAD client side connection. 
  * The ServerConnection should connect to a front end and ask for connection details to the primary server. 
- * @author mattiasolsson
  *
  */
-public class ServerConnection implements Runnable {
+public class ConnectionHandler implements Runnable {
 
 	private volatile boolean mIsListening = false;	
 	private Socket mSocket;
@@ -37,7 +36,7 @@ public class ServerConnection implements Runnable {
 	 * @param frontEndAddress the address to the front end
 	 * @param frontEndPort the port to the front end
 	 */
-	public ServerConnection(GUI gui, String frontEndAddress, int frontEndPort) {
+	public ConnectionHandler(GUI gui, String frontEndAddress, int frontEndPort) {
 		mGUI = gui;
 		try {
 			mFrontEndAddress = InetAddress.getByName(frontEndAddress);
@@ -248,7 +247,6 @@ public class ServerConnection implements Runnable {
 	
 	/**
 	 * Responsible for sending Ping requests to the server. 
-	 * @author mattiasolsson
 	 *
 	 */
 	private class PingService implements Runnable {

@@ -4,9 +4,6 @@ import common.Message;
 
 import java.net.InetAddress;
 
-/**
- * Created by oscar on 2017-02-13.
- */
 public class ConnectionRespondMessage extends Message {
     boolean primary;
     InetAddress primaryAddress;

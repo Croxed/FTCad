@@ -10,9 +10,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Vector;
 
-/**
- * Created by oscar on 2017-02-13.
- */
 public class Connection implements Runnable {
     private volatile Socket m_socket;
     private volatile FrontEnd m_frontEnd;

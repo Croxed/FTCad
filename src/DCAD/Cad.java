@@ -8,7 +8,7 @@ package DCAD;
 public class Cad {
 	
     static private GUI gui = new GUI(750, 600);
-    private ServerConnection mConnection;
+    private ConnectionHandler mConnection;
     
     /**
      * Runs the client project.
@@ -25,7 +25,7 @@ public class Cad {
      */
     private Cad(String[] args) {
     	if(args.length > 1) {
-    		mConnection = new ServerConnection(gui, args[0], Integer.parseInt(args[1]));
+    		mConnection = new ConnectionHandler(gui, args[0], Integer.parseInt(args[1]));
     		gui.setServerConnection(mConnection);
         	new Thread(mConnection).start();
     	} else {

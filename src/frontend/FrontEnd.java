@@ -5,9 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
 
-/**
- * Created by oscar on 2017-02-13.
- */
 public class FrontEnd {
     private ServerSocket m_serverSocket;
     private Socket m_socket;

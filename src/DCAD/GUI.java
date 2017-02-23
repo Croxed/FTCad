@@ -45,7 +45,7 @@ public class GUI extends JFrame implements
 
     //private LinkedList<GObject> objectList = new LinkedList<GObject>();
     
-    private ServerConnection mServerConnection;
+    private ConnectionHandler mServerConnection;
     
     private EventHandler eh = new EventHandler();
 	
@@ -221,7 +221,7 @@ public class GUI extends JFrame implements
 		update(g);
     }
 	
-	public void setServerConnection(ServerConnection serverConnection) {
+	public void setServerConnection(ConnectionHandler serverConnection) {
 		mServerConnection = serverConnection;
 	}
 	
