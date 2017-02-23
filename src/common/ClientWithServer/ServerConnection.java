@@ -72,8 +72,6 @@ public class ServerConnection {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
                 return;
             }
         }
