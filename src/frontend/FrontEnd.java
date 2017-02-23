@@ -68,6 +68,7 @@ public class FrontEnd {
     }
 
     void removeServer(Connection serverConnection) {
+        m_connectedServers.remove(serverConnection);
         if (m_PrimaryServer == serverConnection) {
             pickPrimary();
             try {
@@ -76,7 +77,6 @@ public class FrontEnd {
                 System.err.println("Could not update primary server...");
             }
         }
-        m_connectedServers.remove(serverConnection);
     }
 
     Connection getPrimary() {
