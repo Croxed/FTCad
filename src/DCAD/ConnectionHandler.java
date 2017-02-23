@@ -72,24 +72,32 @@ public class ConnectionHandler implements Runnable {
 				ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
 				System.out.println("Getting address information to the main server");
-				
-				Object response = null;
 				try {
 					output.writeObject(new ConnectionRequestMessage());
-					response = input.readObject();
-				} catch (IOException | ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-				
-				if(response instanceof ConnectionRespondMessage) {
-					ConnectionRespondMessage msg = (ConnectionRespondMessage)response;
-					// Set the address to the primary server
-					mServerAddress = msg.getAddress();
-					mServerPort = msg.getPort();
-					System.out.println("Will connect to primary server with IP: " + mServerAddress + " and port: " + mServerPort);
-					return;
-				} else {
-					System.out.println("Unknown text received from frontend");
+					
+					try {
+						Object response = input.readObject();
+						
+						if(response instanceof ConnectionRespondMessage) {
+							ConnectionRespondMessage msg = (ConnectionRespondMessage)response;
+							// Set the address to the primary server
+							mServerAddress = msg.getAddress();
+							mServerPort = msg.getPort();
+							System.out.println("Will connect to primary server with IP: " + mServerAddress + " and port: " + mServerPort);
+							try {
+								socket.close();
+							} catch (IOException e) {
+								System.err.println("Could not disconnect from the Frontend");
+							}
+							return;
+						} else {
+							System.out.println("Unknown text received from frontend");
+						}
+					} catch (IOException | ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+				} catch (IOException e) {
+					System.out.println("Could not send a connection request message");
 				}
 				
 				System.out.println("Disconnecting from Frontend");
@@ -98,10 +106,10 @@ public class ConnectionHandler implements Runnable {
 				} catch (IOException e) {
 					System.err.println("Could not disconnect from the Frontend");
 				}
-				
 			} catch (IOException e) {
 				System.out.println("Could not connect to Frontend");
 			}
+			
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {}
