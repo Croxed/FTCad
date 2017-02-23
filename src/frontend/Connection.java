@@ -2,6 +2,7 @@ package frontend;
 
 
 import common.PingMessage;
+import common.ServerWithFrontEnd.isPrimaryMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -38,6 +39,10 @@ public class Connection implements Runnable {
      */
     public synchronized int getPort(){
         return m_portnr;
+    }
+
+    synchronized void sendIsPrimary() throws IOException {
+        outputStream.writeObject(new isPrimaryMessage());
     }
 
     /**
@@ -112,7 +117,7 @@ public class Connection implements Runnable {
                 System.out.println("Not connected");
                 pingThread.interrupt();
                 pingThread.join();
-                m_frontEnd.getConnectedServers().remove(this);
+                m_frontEnd.removeServer(this);
                 m_socket.close();
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
