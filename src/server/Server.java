@@ -1,13 +1,16 @@
 package server;
 
 import common.EventHandler;
+import common.EventReceiver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Server {
+import DCAD.ServerConnection;
+
+public class Server implements EventReceiver {
     private ArrayList<ClientConnection> clients = new ArrayList<ClientConnection>(); // Keep a list of the clients
     private FrontEndCommunicator fec;
     private int port;
@@ -60,10 +63,14 @@ public class Server {
         fec.start();
         // Wait for response from frontend before starting server
         while (true) {
-            if (fec.getType() != null) {
-                listenForConnections();
-                return;
-            }
+        	if (fec.getType() != null) {
+	            if (fec.getType() == FrontEndCommunicator.Type.PRIMARY) {
+	                listenForConnections();
+	                return;
+	            } else if (fec.getType() == FrontEndCommunicator.Type.BACKUP) {
+	            	listenToPrimary();
+	            }
+        	}
             try {
                 Thread.sleep(50);
             } catch (InterruptedException sleep) {
@@ -71,7 +78,18 @@ public class Server {
         }
     }
 
-    /**
+    private void listenToPrimary() {
+        try {
+            System.out.println("Connecting to primary server");
+        	ServerConnection sc = new ServerConnection(this, fec.getPrimaryAddress(), fec.getPrimaryPort());
+            sc.run();
+        } catch (IOException e) {
+            System.out.println("Connection to primary server could not be established");
+            e.printStackTrace();
+        }
+	}
+
+	/**
      * Listen for new connections, starting a new ClientConnection for each
      *
      * @throws IOException
@@ -125,4 +143,9 @@ public class Server {
     public enum Type {
         PRIMARY, BACKUP
     }
+
+	@Override
+	public synchronized void addEvents(EventHandler extraEh) {
+		eh.addEvents(extraEh);		
+	}
 }

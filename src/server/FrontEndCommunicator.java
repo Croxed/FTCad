@@ -3,10 +3,12 @@ package server;
 import common.PingMessage;
 import common.ServerWithFrontEnd.ConnectionRequestMessage;
 import common.ServerWithFrontEnd.ConnectionRespondMessage;
+import common.ServerWithFrontEnd.isPrimaryMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class FrontEndCommunicator extends Thread {
@@ -16,7 +18,12 @@ public class FrontEndCommunicator extends Thread {
     private Socket socket;
     private ObjectInputStream input;
     private ObjectOutputStream output;
-    private Boolean primary;
+    private InetAddress primaryAddress;
+    private int primaryPort;
+    
+    public enum Type { PRIMARY, BACKUP }
+    private Type type;
+    
 
     private volatile boolean isConnected = false;
 
@@ -85,8 +92,14 @@ public class FrontEndCommunicator extends Thread {
                 Object obj = input.readObject();
 
                 if (obj instanceof ConnectionRespondMessage) {
-                    primary = ((ConnectionRespondMessage) obj).isPrimary();
+                	ConnectionRespondMessage crm = (ConnectionRespondMessage) obj;
+                    primaryAddress = crm.getPrimaryAddress();
+                    primaryPort = crm.getPrimaryPort();
+                    type = (crm.isPrimary() ? Type.PRIMARY : Type.BACKUP);
                     System.out.println("Frontend responded with a ConnectionRespondMessage");
+                } else if (obj instanceof isPrimaryMessage) {
+                	System.out.println("Backup server evolves into...... PRIMARY SERVER!!!");
+                	type = Type.PRIMARY;
                 } else if (obj instanceof PingMessage) {
                     System.out.print(".");
                 } else {
@@ -105,8 +118,14 @@ public class FrontEndCommunicator extends Thread {
     /**
      * Get which type of server it is
      */
-    public Boolean getType() {
-        return primary;
+    public Type getType() {
+        return type;
+    }
+    public InetAddress getPrimaryAddress() {
+    	return primaryAddress;
+    }
+    public int getPrimaryPort() {
+    	return primaryPort;
     }
 
     /**
