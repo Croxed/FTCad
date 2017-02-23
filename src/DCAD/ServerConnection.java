@@ -78,10 +78,11 @@ public class ServerConnection {
 			mOStream.writeObject(obj);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Socket is closed. You're probably not connected yet...");
 		}
 	}
-	
+
+	@SuppressWarnings("Duplicates")
 	/**
 	 * Keep pinging the server
 	 */
