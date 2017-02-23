@@ -6,12 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import common.PingMessage;
 import common.DeleteEventMessage;
-import common.EventHandler;
 import common.ClientWithFrontEnd.ConnectionRequestMessage;
 import common.ClientWithFrontEnd.ConnectionRespondMessage;
-import common.ClientWithServer.EventRequestMessage;
 
 /**
  * A class that represents the CAD client side connection. 
@@ -20,7 +17,6 @@ import common.ClientWithServer.EventRequestMessage;
  */
 public class ConnectionHandler implements Runnable {
 
-	private volatile boolean mIsListening = false;	
 	private Socket mSocket;
 	private ObjectOutputStream mOStream;
 	private ObjectInputStream mIStream;
@@ -29,7 +25,7 @@ public class ConnectionHandler implements Runnable {
 	private InetAddress mServerAddress;
 	private int mServerPort;
 	private GUI mGUI;
-	private Thread mPingThread;
+	private ServerConnection mSc;
 	
 	/**
 	 * Constructs the ServerConnection, creating the address and setting the port.
@@ -49,36 +45,19 @@ public class ConnectionHandler implements Runnable {
 	 */
 	@Override
 	public void run() {
-		
 		while(true) {
 			mGUI.removeEvents();
 		
 			initializeConnections();
 			
-			//mPingThread = new Thread(new PingService());
-			//mPingThread.start();
-			
-			// While the client is connected to the server
-			// Supply the clients actions to the server and listen for actions created from the server
-			mIsListening = true;
-			listenForServerActions();
-			
-			//try {
-			// 	mPingThread.join();
-			//} catch (InterruptedException e1) { System.err.println("Failed to join the ping thread who cares"); }
-			
-			System.out.println("Disconnecting from the server");
-			
 			try {
-				disconnectSocket();
+				mSc = new ServerConnection(mGUI, mServerAddress, mServerPort);
+				mSc.run();
 			} catch (IOException e) {
-				System.err.println("Could not disconnect from the server");
+				System.out.println("Connection to server could not be established");
+				e.printStackTrace();
 			}
-		
 		}
-		
-		// Maybe want to connect to the front end again or something.
-		//  
 	}
 
 	/**
@@ -87,98 +66,38 @@ public class ConnectionHandler implements Runnable {
 	 * Then, disconnects from the front end and connects to the specified primary server. 
 	 */
 	private void initializeConnections() {
-		
-		// Set up some flags
-		boolean isConnectedToFrontEnd = false;
-
-		// Keep the number of attempts 
-		int attempts = 0;
-		
 		// Try and connect to the frontend   
-		do {
+		while(true) {
 			System.out.println("Attempting to connect to Frontend");
 			try {
 				connectToFrontEnd();
-				isConnectedToFrontEnd = true;
-			} catch (IOException e) {
-				isConnectedToFrontEnd = false;
-			}
-			
-			// Take a nap after each failed attempt 
-			if(!isConnectedToFrontEnd) {
+
+				System.out.println("Getting address information to the main server");
+				getAddressFromFrontEnd();
+				
+				System.out.println("Disconnecting from Frontend");
 				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {}
-			}
-		} while(!isConnectedToFrontEnd && attempts++ < 10);
-		
-		// If is connected to the front end, proceed with getting the connection details to the primary server and connect to it
-		if(isConnectedToFrontEnd) {
-			System.out.println("Getting address information to the main server");
-			getAddressFromFrontEnd();
-			
-			System.out.println("Disconnecting from Frontend");
-			try {
-				disconnectSocket();
-			} catch (IOException e) {
-				System.err.println("Could not disconnect from the Frontend");
-			}
-			
-			System.out.println("Connecting to primary server");
-			try {
-				connectToPrimaryServer();
-			} catch (IOException e) {
-				System.err.println("Could not connect to the primary server");
-			}
-			// If it didn't even connect to the front end, we will end up here 
-		} else {
-			System.out.println("Failed to connect to the Frontend. Don't use this program any more pls");
-		}
-
-	}
-
-	/**
-	 * Listens to the actions received from the server.
-	 */
-	private void listenForServerActions() {
-		System.out.println("Listening for server actions");
- 		while(mIsListening) {
-			System.out.println("Waiting for input from the server");
-			// Receive some input from the server
-			Object input = null;
-			try {
-				input = mIStream.readObject();
-				// Handle the input and put to / update the GUI.
-				if(input instanceof EventHandler) {
-					EventHandler eh = (EventHandler)input;
-					// Add the shape to the GUI's list of objects. But need a reference to the GUI first. 
-					mGUI.addEvents(eh);
-				} else if(input instanceof PingMessage) {
-					System.out.println("Received a ping message");
-				} else {
-					System.err.println("Got some unknown shit from the server");
+					disconnectSocket();
+				} catch (IOException e) {
+					System.err.println("Could not disconnect from the Frontend");
 				}
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				mIsListening = false;
-				return;
+				System.out.println("Could not connect to Frontend");
 			}
-	 	}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
+		}
 	}
+
 	
 	/**
 	 * Send a newly created object to the server. 
 	 * @param deletedGObject the deleted object
 	 */
 	public void sendDeleteObject(GObject deletedGObject) {
-		try {
-			mOStream.writeObject(new DeleteEventMessage(deletedGObject.getUID()));
-		} catch (IOException e) {
-			System.err.println("Failed to send a deleted object.");
-		}
+		mSc.write(new DeleteEventMessage(deletedGObject.getUID()));
 	}
 	
 	/**
@@ -186,19 +105,7 @@ public class ConnectionHandler implements Runnable {
 	 * @param createdGObject the created object
 	 */
 	public void sendCreateObject(GObject createdGObject) {
-		try {
-			mOStream.writeObject(createdGObject);
-		} catch (IOException e) { System.err.println("Failed to send a create GObject to the server"); }
-	}
-
-	/**
-	 * Connects to the primary server. The address should be obtained from the front end.
-	 * @throws IOException if the socket or the streams cannot be instantiated
-	 */
-	private void connectToPrimaryServer() throws IOException {
-		mSocket = new Socket(mServerAddress, mServerPort);
-		mOStream = new ObjectOutputStream(mSocket.getOutputStream());
-		mIStream = new ObjectInputStream(mSocket.getInputStream());
+		mSc.write(createdGObject);
 	}
 
 	/**
@@ -231,7 +138,7 @@ public class ConnectionHandler implements Runnable {
 			
 			System.out.println("Will connect to primary server with IP: " + mServerAddress + " and port: " + mServerPort);
 		} else {
-			// Got some unknown shit from the server probably, if ending up here!! 
+			// Got some unknown shit from the frontend probably, if ending up here!! 
 		}
 	}
 
@@ -243,25 +150,6 @@ public class ConnectionHandler implements Runnable {
 		mOStream.close();
 		mIStream.close();
 		mSocket.close();
-	}
-	
-	/**
-	 * Responsible for sending Ping requests to the server. 
-	 *
-	 */
-	private class PingService implements Runnable {
-		@Override
-		public void run() {
-			while(mIsListening) {
-				try {
-					mOStream.writeObject(new PingMessage());
-					System.out.println("Sending a ping");
-				} catch (IOException e1) { System.err.println("Failed to send a ping message."); }
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) { System.err.println("Failed to sleep"); }
-			}
-		}
 	}
 	
 }
