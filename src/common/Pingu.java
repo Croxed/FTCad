@@ -18,7 +18,7 @@ public class Pingu implements Runnable {
 	public void run() {
         while (!shutdown) {
             try {
-                tsow.write(new PingMessage());
+                tsow.writeObject(new PingMessage());
                 System.out.print("!");
             } catch (IOException e) {
                 // Error when pinging, the connection is probably down, Pingu don't care

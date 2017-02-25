@@ -3,6 +3,8 @@ package common.ClientWithServer;
 import common.ClientWithServer.EventHandler;
 import common.ClientWithServer.EventReceiver;
 import common.PingMessage;
+import common.Pingu;
+import common.ThreadSafeObjectWriter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,35 +14,34 @@ import java.net.Socket;
 
 public class ServerConnection {
     private Socket mSocket;
-    private ObjectOutputStream mOStream;
+    private ThreadSafeObjectWriter mOutput;
     private ObjectInputStream mIStream;
     private EventReceiver mEr;
-    private boolean mIsConnected;
 
     public ServerConnection(EventReceiver er, InetAddress serverAddress, int serverPort) throws IOException {
         mEr = er;
         mSocket = new Socket(serverAddress, serverPort);
-        mOStream = new ObjectOutputStream(mSocket.getOutputStream());
+        mOutput = new ThreadSafeObjectWriter(new ObjectOutputStream(mSocket.getOutputStream()));
         mIStream = new ObjectInputStream(mSocket.getInputStream());
     }
 
     public void run() {
-        mIsConnected = true;
 
         System.out.println("Starting Pinger");
 
-        Thread ping = new Thread(new Pinger());
-        ping.start();
+        Pingu pingRunnable = new Pingu(mOutput);
+        Thread pingThread = new Thread(pingRunnable);
+        pingThread.start();
 
         listenForServerActions();
 
-        mIsConnected = false;
 
         System.out.println("Connection Finished, stopping pinger and closing socket");
 
         try {
-            ping.interrupt();
-            ping.join();
+        	pingRunnable.shutdown();
+            pingThread.interrupt();
+            pingThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -79,32 +80,10 @@ public class ServerConnection {
 
     public void write(Object obj) {
         try {
-            mOStream.writeObject(obj);
+            mOutput.writeObject(obj);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             System.err.println("Socket is closed. You're probably not connected yet...");
-        }
-    }
-
-    @SuppressWarnings("Duplicates")
-    /**
-     * Keep pinging the server
-     */
-    private class Pinger implements Runnable {
-        public void run() {
-            while (mIsConnected) {
-                try {
-                    mOStream.writeObject(new PingMessage());
-                    System.out.print("!");
-                } catch (IOException e) {
-                    System.err.println("Could not ping");
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    System.err.println("Could not sleep");
-                }
-            }
         }
     }
 }

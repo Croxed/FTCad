@@ -10,7 +10,7 @@ public class ThreadSafeObjectWriter {
 		oos = _oos;
 	}
 	
-	public synchronized void write(Object o) throws IOException {
+	public synchronized void writeObject(Object o) throws IOException {
 		oos.writeObject(o);
 	}
 }

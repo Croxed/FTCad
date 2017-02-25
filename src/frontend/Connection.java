@@ -46,7 +46,7 @@ public class Connection implements Runnable {
     }
 
     synchronized void sendIsPrimary() throws IOException {
-        output.write(new isPrimaryMessage());
+        output.writeObject(new isPrimaryMessage());
     }
 
     /**
@@ -67,19 +67,19 @@ public class Connection implements Runnable {
                 System.out.println("A server connected!");
                 connectedServer.add(this);
                 Connection primary = m_frontEnd.getPrimary();
-                output.write(new common.ServerWithFrontEnd.ConnectionRespondMessage(primary == this, primary.getAddress(), primary.getPort()));
+                output.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(primary == this, primary.getAddress(), primary.getPort()));
             }
             // Determines if the message is from a client
             else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
                 Connection serverConnection = m_frontEnd.getPrimary();
                 System.out.println("A client connected!");
                 if (serverConnection == null)
-                    output.write(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
+                    output.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
                 else {
                     InetAddress address = serverConnection.getAddress();
                     int port = serverConnection.getPort();
                     System.out.println(address.toString() + ":" + port);
-                    output.write(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
+                    output.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
                 }
                 isConnected = false;
             }

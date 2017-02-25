@@ -1,6 +1,8 @@
 package server;
 
 import common.PingMessage;
+import common.Pingu;
+import common.ThreadSafeObjectWriter;
 import common.ServerWithFrontEnd.ConnectionRequestMessage;
 import common.ServerWithFrontEnd.ConnectionRespondMessage;
 import common.ServerWithFrontEnd.isPrimaryMessage;
@@ -17,15 +19,13 @@ public class FrontEndCommunicator extends Thread {
     private Server server;
     private Socket socket;
     private ObjectInputStream input;
-    private ObjectOutputStream output;
+    private ThreadSafeObjectWriter output;
     private InetAddress primaryAddress;
     private int primaryPort;
     
     public enum Type { PRIMARY, BACKUP }
     private Type type;
     
-
-    private volatile boolean isConnected = false;
 
     /**
      * Connects and listens to frontend
@@ -51,22 +51,22 @@ public class FrontEndCommunicator extends Thread {
                 socket = new Socket(java.net.InetAddress.getByName(hostName), hostPort);
                 socket.setSoTimeout(5000);
                 input = new ObjectInputStream(socket.getInputStream());
-                output = new ObjectOutputStream(socket.getOutputStream());
+                output = new ThreadSafeObjectWriter(new ObjectOutputStream(socket.getOutputStream()));
 
                 output.writeObject(new ConnectionRequestMessage(server.getPort()));
                 System.out.println("Sent server request message");
 
-                isConnected = true;
-
-                Thread ping = new Thread(new Pinger());
-                ping.start();
+                
+                Pingu pingRunnable = new Pingu(output);
+                Thread pingThread = new Thread(pingRunnable);
+                pingThread.start();
 
                 listenToFrontEnd();
 
-                isConnected = false;
                 try {
-                    ping.interrupt();
-                    ping.join();
+                	pingRunnable.shutdown();
+                	pingThread.interrupt();
+                	pingThread.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -126,26 +126,5 @@ public class FrontEndCommunicator extends Thread {
     }
     public int getPrimaryPort() {
     	return primaryPort;
-    }
-
-    /**
-     * Keep pinging the frontend
-     */
-    private class Pinger implements Runnable {
-        public void run() {
-            while (isConnected) {
-                try {
-                    output.writeObject(new PingMessage());
-                    System.out.print("!");
-                } catch (IOException e) {
-                    System.err.println("Could not ping");
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    System.err.println("Could not sleep");
-                }
-            }
-        }
     }
 }
