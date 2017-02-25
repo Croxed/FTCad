@@ -2,6 +2,8 @@ package frontend;
 
 
 import common.PingMessage;
+import common.Pingu;
+import common.ThreadSafeObjectWriter;
 import common.ServerWithFrontEnd.isPrimaryMessage;
 
 import java.io.IOException;
@@ -14,7 +16,7 @@ import java.util.Vector;
 public class Connection implements Runnable {
     private volatile Socket m_socket;
     private volatile FrontEnd m_frontEnd;
-    private ObjectOutputStream outputStream;
+    private ThreadSafeObjectWriter output;
     private ObjectInputStream inputStream;
     private volatile int m_portnr;
     private volatile boolean isConnected;
@@ -44,7 +46,7 @@ public class Connection implements Runnable {
     }
 
     synchronized void sendIsPrimary() throws IOException {
-        outputStream.writeObject(new isPrimaryMessage());
+        output.write(new isPrimaryMessage());
     }
 
     /**
@@ -54,7 +56,7 @@ public class Connection implements Runnable {
      */
     private synchronized void openStream() {
         try {
-            outputStream = new ObjectOutputStream(m_socket.getOutputStream());
+            output = new ThreadSafeObjectWriter(new ObjectOutputStream(m_socket.getOutputStream()));
             inputStream = new ObjectInputStream(m_socket.getInputStream());
             Object input = inputStream.readObject();
             Vector<Connection> connectedServer = m_frontEnd.getConnectedServers();
@@ -65,19 +67,19 @@ public class Connection implements Runnable {
                 System.out.println("A server connected!");
                 connectedServer.add(this);
                 Connection primary = m_frontEnd.getPrimary();
-                outputStream.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(primary == this, primary.getAddress(), primary.getPort()));
+                output.write(new common.ServerWithFrontEnd.ConnectionRespondMessage(primary == this, primary.getAddress(), primary.getPort()));
             }
             // Determines if the message is from a client
             else if (input instanceof common.ClientWithFrontEnd.ConnectionRequestMessage) {
                 Connection serverConnection = m_frontEnd.getPrimary();
                 System.out.println("A client connected!");
                 if (serverConnection == null)
-                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
+                    output.write(new common.ClientWithFrontEnd.ConnectionRespondMessage(null, 0));
                 else {
                     InetAddress address = serverConnection.getAddress();
                     int port = serverConnection.getPort();
                     System.out.println(address.toString() + ":" + port);
-                    outputStream.writeObject(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
+                    output.write(new common.ClientWithFrontEnd.ConnectionRespondMessage(address, port));
                 }
                 isConnected = false;
             }
@@ -101,7 +103,8 @@ public class Connection implements Runnable {
     public void run() {
         openStream();
         while (isConnected) {
-            Thread pingThread = new Thread(new Pinger());
+        	Pingu pingRunnable = new Pingu(output);
+            Thread pingThread = new Thread(pingRunnable);
             pingThread.start();
             while (isConnected) {
                 Object input;
@@ -117,36 +120,13 @@ public class Connection implements Runnable {
             }
             try {
                 System.out.println("Not connected");
+                pingRunnable.shutdown();
                 pingThread.interrupt();
                 pingThread.join();
                 m_frontEnd.removeServer(this);
                 m_socket.close();
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Thread to ping the server that connected.
-     * Does this every second, thus Thread.sleep(1000).
-     */
-    @SuppressWarnings("Duplicates")
-    private class Pinger implements Runnable {
-        @Override
-        public void run() {
-            while (isConnected) {
-                try {
-                    outputStream.writeObject(new PingMessage());
-                    System.out.print("!");
-                } catch (IOException e) {
-                    System.err.println("Could not ping");
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    System.err.println("Could not sleep");
-                }
             }
         }
     }
