@@ -7,7 +7,7 @@ public class Pingu implements Runnable {
 	private ThreadSafeObjectWriter tsow; 
 	
 	public void shutdown() {
-		shutdown = false;
+		shutdown = true;
 	}
 	
 	public Pingu(ThreadSafeObjectWriter _tsow) {
