@@ -11,6 +11,7 @@ import common.ClientWithServer.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 
 public class GUI extends JFrame implements
     WindowListener,ActionListener,MouseListener,MouseMotionListener, EventReceiver {
@@ -186,7 +187,7 @@ public class GUI extends JFrame implements
 
     public void update(Graphics g) {
 		g.setColor(Color.BLACK);
-		g.fillRect(0, 60, getSize().width, getSize().height - 60);
+		g.fillRect(0, 62, getSize().width, getSize().height - 62);
 	
 		template.draw(g);
 		
@@ -204,8 +205,10 @@ public class GUI extends JFrame implements
     }
 	
 	public void paint(Graphics g) {
-		super.paint(g); // The superclass (JFrame) paint function draws the GUI components.
-		update(g);
+    	BufferedImage bf = new BufferedImage( this.getWidth(),this.getHeight(), BufferedImage.TYPE_INT_RGB);
+		super.paint(bf.getGraphics()); // The superclass (JFrame) paint function draws the GUI components.
+		update(bf.getGraphics());
+		g.drawImage(bf,0,0,null);
     }
 	
 	public void setServerConnection(ConnectionHandler serverConnection) {
