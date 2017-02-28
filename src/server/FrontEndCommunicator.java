@@ -106,8 +106,7 @@ public class FrontEndCommunicator extends Thread {
             } catch (ClassNotFoundException e) {
                 System.out.println("Can't parse message");
             } catch (IOException e) {
-                System.out.println("Error when reading");
-                e.printStackTrace();
+                System.out.println("Connection with frontend failed.");
                 return;
             }
         }
