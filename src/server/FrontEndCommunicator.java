@@ -2,10 +2,10 @@ package server;
 
 import common.PingMessage;
 import common.Pingu;
-import common.ThreadSafeObjectWriter;
 import common.ServerWithFrontEnd.ConnectionRequestMessage;
 import common.ServerWithFrontEnd.ConnectionRespondMessage;
 import common.ServerWithFrontEnd.isPrimaryMessage;
+import common.ThreadSafeObjectWriter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,10 +22,7 @@ public class FrontEndCommunicator extends Thread {
     private ThreadSafeObjectWriter output;
     private InetAddress primaryAddress;
     private int primaryPort;
-    
-    public enum Type { PRIMARY, BACKUP }
     private Type type;
-    
 
     /**
      * Connects and listens to frontend
@@ -40,7 +37,6 @@ public class FrontEndCommunicator extends Thread {
         return (socket != null && socket.isConnected());
     }
 
-
     /**
      * Connects and listens to frontend
      */
@@ -53,10 +49,18 @@ public class FrontEndCommunicator extends Thread {
                 input = new ObjectInputStream(socket.getInputStream());
                 output = new ThreadSafeObjectWriter(new ObjectOutputStream(socket.getOutputStream()));
 
-                output.writeObject(new ConnectionRequestMessage(server.getPort()));
+                output.writeObject(new ConnectionRequestMessage(server.getPort(), type == Type.PRIMARY));
                 System.out.println("Sent server request message");
 
-                
+                Object obj = input.readObject();
+                if (obj instanceof ConnectionRespondMessage) {
+                    ConnectionRespondMessage crm = (ConnectionRespondMessage) obj;
+                    primaryAddress = crm.getPrimaryAddress();
+                    primaryPort = crm.getPrimaryPort();
+                    type = (crm.isPrimary() ? Type.PRIMARY : Type.BACKUP);
+                    System.out.println("Frontend responded with a ConnectionRespondMessage");
+                }
+
                 Pingu pingRunnable = new Pingu(output);
                 Thread pingThread = new Thread(pingRunnable);
                 pingThread.start();
@@ -64,15 +68,15 @@ public class FrontEndCommunicator extends Thread {
                 listenToFrontEnd();
 
                 try {
-                	pingRunnable.shutdown();
-                	pingThread.interrupt();
-                	pingThread.join();
+                    pingRunnable.shutdown();
+                    pingThread.interrupt();
+                    pingThread.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 socket.close();
 
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 System.out.println("Connection refused. Trying again in 1 second");
                 try {
                     Thread.sleep(1000);
@@ -91,15 +95,9 @@ public class FrontEndCommunicator extends Thread {
             try {
                 Object obj = input.readObject();
 
-                if (obj instanceof ConnectionRespondMessage) {
-                	ConnectionRespondMessage crm = (ConnectionRespondMessage) obj;
-                    primaryAddress = crm.getPrimaryAddress();
-                    primaryPort = crm.getPrimaryPort();
-                    type = (crm.isPrimary() ? Type.PRIMARY : Type.BACKUP);
-                    System.out.println("Frontend responded with a ConnectionRespondMessage");
-                } else if (obj instanceof isPrimaryMessage) {
-                	System.out.println("Backup server evolves into...... PRIMARY SERVER!!!");
-                	type = Type.PRIMARY;
+                if (obj instanceof isPrimaryMessage) {
+                    System.out.println("Backup server evolves into...... PRIMARY SERVER!!!");
+                    type = Type.PRIMARY;
                 } else if (obj instanceof PingMessage) {
                     System.out.print(".");
                 } else {
@@ -121,10 +119,14 @@ public class FrontEndCommunicator extends Thread {
     public Type getType() {
         return type;
     }
+
     public InetAddress getPrimaryAddress() {
-    	return primaryAddress;
+        return primaryAddress;
     }
+
     public int getPrimaryPort() {
-    	return primaryPort;
+        return primaryPort;
     }
+
+    public enum Type {PRIMARY, BACKUP}
 }

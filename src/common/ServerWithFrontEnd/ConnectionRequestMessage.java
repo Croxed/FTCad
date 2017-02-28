@@ -5,9 +5,15 @@ import common.Message;
 public class ConnectionRequestMessage extends Message {
     private static final long serialVersionUID = 1;
     private int portNr;
+    private boolean wasPrimary;
 
-    public ConnectionRequestMessage(int serverPort) {
+    public ConnectionRequestMessage(int serverPort, boolean _wasPrimary) {
         portNr = serverPort;
+        wasPrimary = _wasPrimary;
+    }
+
+    public boolean wasPrimary() {
+        return wasPrimary;
     }
 
     public int getPortNr() {

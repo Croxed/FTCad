@@ -3,8 +3,8 @@ package frontend;
 
 import common.PingMessage;
 import common.Pingu;
-import common.ThreadSafeObjectWriter;
 import common.ServerWithFrontEnd.isPrimaryMessage;
+import common.ThreadSafeObjectWriter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -65,7 +65,8 @@ public class Connection implements Runnable {
                 common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
                 m_portnr = msg.getPortNr();
                 System.out.println("A server connected!");
-                connectedServer.add(this);
+                m_frontEnd.addServer(this, msg.wasPrimary());
+                m_frontEnd.waitForAllowance();
                 Connection primary = m_frontEnd.getPrimary();
                 output.writeObject(new common.ServerWithFrontEnd.ConnectionRespondMessage(primary == this, primary.getAddress(), primary.getPort()));
             }
@@ -103,7 +104,7 @@ public class Connection implements Runnable {
     public void run() {
         openStream();
         while (isConnected) {
-        	Pingu pingRunnable = new Pingu(output);
+            Pingu pingRunnable = new Pingu(output);
             Thread pingThread = new Thread(pingRunnable);
             pingThread.start();
             while (isConnected) {

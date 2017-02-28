@@ -10,6 +10,7 @@ public class FrontEnd {
     private Socket m_socket;
     private volatile Vector<Connection> m_connectedServers = new Vector<>();
     private Connection m_PrimaryServer;
+    private long m_time;
 
     /**
      * Create a front end, where the port number is the port where the front end should listen for
@@ -20,6 +21,7 @@ public class FrontEnd {
      */
     public FrontEnd(int portNumber) throws IOException {
         m_serverSocket = new ServerSocket(portNumber);
+        m_time = System.currentTimeMillis();
     }
 
     public static void main(String[] args) {
@@ -79,6 +81,13 @@ public class FrontEnd {
         }
     }
 
+    public synchronized void addServer(Connection server, boolean wasPrimary) {
+        m_connectedServers.add(server);
+        if (m_PrimaryServer == null && wasPrimary) {
+            m_PrimaryServer = server;
+        }
+    }
+
     Connection getPrimary() {
         if (m_PrimaryServer == null) {
             pickPrimary();
@@ -88,5 +97,15 @@ public class FrontEnd {
 
     private void pickPrimary() {
         m_PrimaryServer = m_connectedServers.size() != 0 ? m_connectedServers.firstElement() : null;
+    }
+
+    public void waitForAllowance() {
+        if (m_time + 5000 > System.currentTimeMillis()) {
+            try {
+                Thread.sleep(m_time + 5000 - System.currentTimeMillis());
+            } catch (Exception e) {
+                System.err.println("Could not sleep");
+            }
+        }
     }
 }
