@@ -124,7 +124,7 @@ public class ConnectionHandler implements Runnable {
 
 
     /**
-     * Send a newly created object to the server.
+     * Send a newly deleted object to the server.
      *
      * @param deletedGObject the deleted object
      */

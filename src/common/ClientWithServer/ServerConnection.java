@@ -25,6 +25,7 @@ public class ServerConnection {
         mIStream = new ObjectInputStream(mSocket.getInputStream());
     }
 
+    
     public void run() {
 
         System.out.println("Starting Pinger");
@@ -53,17 +54,19 @@ public class ServerConnection {
 
     /**
      * Listens to the actions received from the server.
+     * 
+     * Begins waiting for and object
+     * If the object is an EvenHandler, add the object to the clients Arraylist
+     * If the object is a pingMessage, print out the ping
+     * @param listenForServerActions
      */
     private void listenForServerActions() {
         System.out.println("Listening for server actions");
         while (true) {
             try {
-                // Wait for object
                 Object input = mIStream.readObject();
-                // Handle the input and put to / update the GUI.
                 if (input instanceof EventHandler) {
                     EventHandler eh = (EventHandler) input;
-                    // Add the shape to the GUI's list of objects. But need a reference to the GUI first.
                     mEr.addEvents(eh);
                 } else if (input instanceof PingMessage) {
                     System.out.print(".");
@@ -77,7 +80,11 @@ public class ServerConnection {
             }
         }
     }
-
+    
+    /**
+     * Writes the object to the server
+     * @param write()
+     */
     public void write(Object obj) {
         try {
             mOutput.writeObject(obj);

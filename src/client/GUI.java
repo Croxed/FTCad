@@ -210,7 +210,10 @@ public class GUI extends JFrame implements
 		update(bf.getGraphics());
 		g.drawImage(bf,0,0,null);
     }
-	
+	/**
+	 * Sets the ServerConnection for the client
+	 * @param serverConnection
+	 */
 	public void setServerConnection(ConnectionHandler serverConnection) {
 		mServerConnection = serverConnection;
 	}
@@ -224,7 +227,7 @@ public class GUI extends JFrame implements
 		eh.addEvents(extraEh);
 		repaint();
 	}
-
+	
 	public synchronized void removeEvents() {
 		eh = new EventHandler();
 		repaint();
