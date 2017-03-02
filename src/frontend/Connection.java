@@ -17,7 +17,7 @@ public class Connection implements Runnable {
     private volatile FrontEnd m_frontEnd;
     private ThreadSafeObjectWriter output;
     private ObjectInputStream inputStream;
-    private volatile int m_portnr;
+    private volatile int mPortNr;
     private volatile boolean isConnected;
 
     public Connection(FrontEnd frontEnd, Socket socket) {
@@ -39,7 +39,7 @@ public class Connection implements Runnable {
      * Get port of the server that connected to front end
      */
     public synchronized int getPort() {
-        return m_portnr;
+        return mPortNr;
     }
 
     synchronized void sendIsPrimary() throws IOException {
@@ -59,7 +59,7 @@ public class Connection implements Runnable {
             //Determines if the message is from a server
             if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
                 common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
-                m_portnr = msg.getPortNr();
+                mPortNr = msg.getPortNr();
                 System.out.println("A server connected!");
                 m_frontEnd.addServer(this, msg.wasPrimary());
                 m_frontEnd.waitForAllowance();

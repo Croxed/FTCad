@@ -20,20 +20,14 @@ public class Server implements EventReceiver {
      * Init Server object
      *
      * @param _port number to start the server on
-     * @throws IOException if the server could not bind to the specified port
      */
-    public Server(int _port) throws IOException {
+    public Server(int _port) {
         port = _port;
     }
 
-    /**
-     * Start the server
-     *
-     * @param starting arguments when opening from a terminal
-     */
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("Usage: java Server.Server frontendadress frontendport portnumber");
+            System.err.println("Usage: java Server.Server frontendaddress frontendport portnumber");
             System.exit(-1);
         }
         try {
