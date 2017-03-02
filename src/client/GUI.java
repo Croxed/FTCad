@@ -212,7 +212,7 @@ public class GUI extends JFrame implements
     }
 	/**
 	 * Sets the ServerConnection for the client
-	 * @param serverConnection
+	 * @param serverConnection The class that manages connection to the Server
 	 */
 	public void setServerConnection(ConnectionHandler serverConnection) {
 		mServerConnection = serverConnection;
@@ -220,7 +220,7 @@ public class GUI extends JFrame implements
 	
 	/**
 	 * Add a GObject Shape to the GUI.
-	 * @param gObject
+	 * @param extraEh All received events inside a wrapper
 	 */
 	
 	public synchronized void addEvents(EventHandler extraEh) {

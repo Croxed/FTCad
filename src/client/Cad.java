@@ -7,7 +7,6 @@ package client;
 public class Cad {
 
     static private GUI gui = new GUI(750, 600);
-    private ConnectionHandler mConnection;
 
     /**
      * Constructs the Cad object. Creates connection to the server.
@@ -16,9 +15,9 @@ public class Cad {
      */
     private Cad(String[] args) {
         if (args.length > 1) {
-            mConnection = new ConnectionHandler(gui, args[0], Integer.parseInt(args[1]));
-            gui.setServerConnection(mConnection);
-            new Thread(mConnection).start();
+            ConnectionHandler connectionHandler = new ConnectionHandler(gui, args[0], Integer.parseInt(args[1]));
+            gui.setServerConnection(connectionHandler);
+            new Thread(connectionHandler).start();
         } else {
             System.err.println("Need arguments <Frontend address> <Frontend port>");
             System.exit(-1);

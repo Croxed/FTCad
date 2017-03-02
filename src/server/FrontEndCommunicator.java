@@ -17,9 +17,7 @@ public class FrontEndCommunicator extends Thread {
     private final String hostName;
     private final int hostPort;
     private Server server;
-    private Socket socket;
     private ObjectInputStream input;
-    private ThreadSafeObjectWriter output;
     private InetAddress primaryAddress;
     private int primaryPort;
     private Type type;
@@ -33,10 +31,6 @@ public class FrontEndCommunicator extends Thread {
         hostPort = _hostPort;
     }
 
-    private boolean isConnected() {
-        return (socket != null && socket.isConnected());
-    }
-
     /**
      * Connects and listens to frontend
      */
@@ -44,10 +38,10 @@ public class FrontEndCommunicator extends Thread {
         while (true) {
             try {
                 System.out.println("Trying to send server request message");
-                socket = new Socket(java.net.InetAddress.getByName(hostName), hostPort);
+                Socket socket = new Socket(InetAddress.getByName(hostName), hostPort);
                 socket.setSoTimeout(5000);
                 input = new ObjectInputStream(socket.getInputStream());
-                output = new ThreadSafeObjectWriter(new ObjectOutputStream(socket.getOutputStream()));
+                ThreadSafeObjectWriter output = new ThreadSafeObjectWriter(new ObjectOutputStream(socket.getOutputStream()));
 
                 output.writeObject(new ConnectionRequestMessage(server.getPort(), type == Type.PRIMARY));
                 System.out.println("Sent server request message");

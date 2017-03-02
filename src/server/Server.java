@@ -11,16 +11,15 @@ import java.util.ArrayList;
 import common.ClientWithServer.ServerConnection;
 
 public class Server implements EventReceiver {
-    private ArrayList<ClientConnection> clients = new ArrayList<ClientConnection>(); // Keep a list of the clients
+    private ArrayList<ClientConnection> clients = new ArrayList<>(); // Keep a list of the clients
     private FrontEndCommunicator fec;
     private int port;
-    private ServerSocket socket;
     private EventHandler eh = new EventHandler();
 
     /**
      * Init Server object
      *
-     * @param port number to start the server on
+     * @param _port number to start the server on
      * @throws IOException if the server could not bind to the specified port
      */
     public Server(int _port) throws IOException {
@@ -53,9 +52,9 @@ public class Server implements EventReceiver {
     /**
      * Talk with frontend and if successful listen for connections
      *
-     * @param hostname of frontend
-     * @param port     of frontend
-     * @throws IOException
+     * @param hostName of frontend
+     * @param hostPort of frontend
+     * @throws IOException If connection failed
      */
     private void talkWithFrontend(String hostName, int hostPort) throws IOException {
         //Starts the front end thread
@@ -92,10 +91,10 @@ public class Server implements EventReceiver {
 	/**
      * Listen for new connections, starting a new ClientConnection for each
      *
-     * @throws IOException
+     * @throws IOException if connection failed
      */
     public void listenForConnections() throws IOException {
-        socket = new ServerSocket(port);
+        ServerSocket socket = new ServerSocket(port);
         System.out.println("Waiting for client messages on port " + port);
 
         // Keep listening
@@ -138,10 +137,6 @@ public class Server implements EventReceiver {
      */
     public int getPort() {
         return port;
-    }
-
-    public enum Type {
-        PRIMARY, BACKUP
     }
 
 	@Override

@@ -17,7 +17,7 @@ import java.util.UUID;
 public class GObject implements Serializable {
 
     /**
-     * This is always very neccesary.
+     * This is always very necessary.
      */
     private static final long serialVersionUID = 1L;
     private common.ClientWithServer.Shape s;

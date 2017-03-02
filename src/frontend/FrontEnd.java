@@ -7,7 +7,6 @@ import java.util.Vector;
 
 public class FrontEnd {
     private ServerSocket m_serverSocket;
-    private Socket m_socket;
     private volatile Vector<Connection> m_connectedServers = new Vector<>();
     private Connection m_PrimaryServer;
     private long m_time;
@@ -42,15 +41,6 @@ public class FrontEnd {
     }
 
     /**
-     * Get a vector of connected servers.
-     *
-     * @return Vector with connected servers.
-     */
-    public synchronized Vector<Connection> getConnectedServers() {
-        return m_connectedServers;
-    }
-
-    /**
      * Listens for new connections.
      * Creates a new connection when someone connects to the front end.
      */
@@ -58,7 +48,7 @@ public class FrontEnd {
         System.out.println("Listening for messages");
         while (true) {
             try {
-                m_socket = m_serverSocket.accept();
+                Socket m_socket = m_serverSocket.accept();
                 System.out.println("New connection!");
                 Connection connection = new Connection(this, m_socket);
                 Thread connectionThread = new Thread(connection);

@@ -56,9 +56,8 @@ public class ServerConnection {
      * Listens to the actions received from the server.
      * 
      * Begins waiting for and object
-     * If the object is an EvenHandler, add the object to the clients Arraylist
+     * If the object is an EvenHandler, add the object to the clients ArrayList
      * If the object is a pingMessage, print out the ping
-     * @param listenForServerActions
      */
     private void listenForServerActions() {
         System.out.println("Listening for server actions");
@@ -83,7 +82,7 @@ public class ServerConnection {
     
     /**
      * Writes the object to the server
-     * @param write()
+     * @param obj Object to write to the outputStream.
      */
     public void write(Object obj) {
         try {

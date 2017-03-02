@@ -11,7 +11,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Vector;
 
 public class Connection implements Runnable {
     private volatile Socket m_socket;
@@ -38,8 +37,6 @@ public class Connection implements Runnable {
 
     /**
      * Get port of the server that connected to front end
-     *
-     * @return
      */
     public synchronized int getPort() {
         return m_portnr;
@@ -59,7 +56,6 @@ public class Connection implements Runnable {
             output = new ThreadSafeObjectWriter(new ObjectOutputStream(m_socket.getOutputStream()));
             inputStream = new ObjectInputStream(m_socket.getInputStream());
             Object input = inputStream.readObject();
-            Vector<Connection> connectedServer = m_frontEnd.getConnectedServers();
             //Determines if the message is from a server
             if (input instanceof common.ServerWithFrontEnd.ConnectionRequestMessage) {
                 common.ServerWithFrontEnd.ConnectionRequestMessage msg = (common.ServerWithFrontEnd.ConnectionRequestMessage) input;
