@@ -1,7 +1,10 @@
 package common;
 
 import java.io.IOException;
-
+/**
+ * Pingu is a help class to send pings
+ *
+ */
 public class Pingu implements Runnable {
 	private volatile boolean shutdown = false;
 	private ThreadSafeObjectWriter tsow; 
@@ -15,6 +18,7 @@ public class Pingu implements Runnable {
 	}
 
 	@Override
+
 	public void run() {
         while (!shutdown) {
             try {

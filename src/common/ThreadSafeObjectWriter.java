@@ -5,7 +5,10 @@ import java.io.ObjectOutputStream;
 
 public class ThreadSafeObjectWriter {
 	ObjectOutputStream oos;
-	
+/** 
+ * Makes the sent object safe for threading
+ * @param _oos
+ */
 	public ThreadSafeObjectWriter(ObjectOutputStream _oos) {
 		oos = _oos;
 	}

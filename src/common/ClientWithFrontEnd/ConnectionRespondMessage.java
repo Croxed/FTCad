@@ -4,6 +4,7 @@ import common.Message;
 
 import java.net.InetAddress;
 
+
 public class ConnectionRespondMessage extends Message {
     private InetAddress address;
     private int port;
