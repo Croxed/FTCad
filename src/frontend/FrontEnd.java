@@ -74,7 +74,9 @@ public class FrontEnd {
         if (m_PrimaryServer == serverConnection) {
             pickPrimary();
             try {
-                m_PrimaryServer.sendIsPrimary();
+                if(m_PrimaryServer != null) {
+                    m_PrimaryServer.sendIsPrimary();
+                }
             } catch (IOException e) {
                 System.err.println("Could not update primary server...");
             }
