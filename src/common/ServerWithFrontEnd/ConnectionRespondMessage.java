@@ -4,6 +4,9 @@ import common.Message;
 
 import java.net.InetAddress;
 
+/**
+ *Respond message to server with portnumber and primary status
+ */
 public class ConnectionRespondMessage extends Message {
     boolean primary;
     InetAddress primaryAddress;

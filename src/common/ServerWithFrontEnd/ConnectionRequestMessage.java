@@ -1,7 +1,10 @@
 package common.ServerWithFrontEnd;
 
 import common.Message;
-
+ 
+/**
+ *Requests message connection for portnumber and primary status
+ */
 public class ConnectionRequestMessage extends Message {
     private static final long serialVersionUID = 1;
     private int portNr;
