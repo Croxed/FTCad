@@ -10,8 +10,8 @@ public class Cad {
 
     /**
      * Constructs the Cad object. Creates connection to the server.
-     * @param args the connection details from main()
      * It also starts a thread of this clients ServerConnection
+     * @param args the connection details from main()
      */
     private Cad(String[] args) {
         if (args.length > 1) {

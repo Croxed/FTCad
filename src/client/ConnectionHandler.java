@@ -28,9 +28,8 @@ public class ConnectionHandler implements Runnable {
 
     /**
      * Constructs the ServerConnection, creating the address and setting the port.
-     *
      * @param frontEndAddress the address to the front end
-     * @param frontEndPort    the port to the front end
+     * @param frontEndPort the port to the front end
      */
     public ConnectionHandler(GUI gui, String frontEndAddress, int frontEndPort) {
         mGUI = gui;
@@ -49,7 +48,8 @@ public class ConnectionHandler implements Runnable {
     public void run() {
         while (true) {
             mGUI.removeEvents();
-
+            
+            // Get the connection details to the primary server from the front end
             getMainServerFromFrontend();
 
             try {
@@ -68,23 +68,31 @@ public class ConnectionHandler implements Runnable {
      * Then, disconnects from the front end and connects to the specified primary server.
      */
     private void getMainServerFromFrontend() {
-        // Try and connect to the frontend
+       
+    	// Keep trying to get the connection details until the end of time
         while (true) {
             System.out.println("Attempting to connect to Frontend");
+            
+            // Setup a socket to exchange information with the front end through
             try {
                 Socket socket = new Socket(mFrontEndAddress, mFrontEndPort);
                 ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
                 ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
                 System.out.println("Getting address information to the main server");
+                
+                // Try and request the connection details from the front end 
                 try {
                     output.writeObject(new ConnectionRequestMessage());
 
+                    // Try and get a response from front end
                     try {
                         Object response = input.readObject();
 
+                        // If the response is a Message containing connection details, handle it
                         if (response instanceof ConnectionRespondMessage) {
                             ConnectionRespondMessage msg = (ConnectionRespondMessage) response;
+                            
                             // Set the address to the primary server
                             mServerAddress = msg.getAddress();
                             mServerPort = msg.getPort();
@@ -94,7 +102,11 @@ public class ConnectionHandler implements Runnable {
                             } catch (IOException e) {
                                 System.err.println("Could not disconnect from the Frontend");
                             }
+                            
+                            // We got what we wanted, return from the method
                             return;
+                            
+                            // Handle all possible errors that could have occured on the way
                         } else {
                             System.out.println("Unknown text received from frontend");
                         }
@@ -115,6 +127,7 @@ public class ConnectionHandler implements Runnable {
                 System.out.println("Could not connect to Frontend");
             }
 
+            // Wait a second before trying again
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -122,10 +135,8 @@ public class ConnectionHandler implements Runnable {
         }
     }
 
-
     /**
      * Send a newly deleted object to the server.
-     *
      * @param deletedGObject the deleted object
      */
     public void sendDeleteObject(GObject deletedGObject) {
@@ -134,7 +145,6 @@ public class ConnectionHandler implements Runnable {
 
     /**
      * Send a newly created object to the server.
-     *
      * @param createdGObject the created object
      */
     public void sendCreateObject(GObject createdGObject) {

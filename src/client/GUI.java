@@ -31,8 +31,6 @@ public class GUI extends JFrame implements
     private GObject template = new GObject(common.ClientWithServer.Shape.OVAL, Color.RED, 363, 65, 25, 25);
     private GObject current = null;
 
-    //private LinkedList<GObject> objectList = new LinkedList<GObject>();
-    
     private ConnectionHandler mServerConnection;
     
     private EventHandler eh = new EventHandler();
@@ -102,16 +100,14 @@ public class GUI extends JFrame implements
 
     /**
      * Handles the event when the user clicks the mouse. 
-     * Action is taken if it is the third mousebutton, then the object is deleted and the deletion event it sent to the server. 
+     * Action is taken if the button clicked is the third mousebutton. 
+     * The object at the mouse, if any, is then identified and a delete action is sent to the server. 
      */
     @Override
     public void mouseClicked(MouseEvent e) {
 		// User clicks the right mouse button:
 		// undo an operation by removing the most recently added object.
 		if(e.getButton() == MouseEvent.BUTTON3) {
-			
-			// Get a reference to the removed object 
-		    //GObject removedObject = objectList.removeLast();
 		    
 		    // Send the action to the server
 			GObject lastElement = null;
@@ -127,7 +123,7 @@ public class GUI extends JFrame implements
 
     /**
      * Handles the event when the user releases a mouse button. 
-     * Action is taken if a "current" object is in focus, then a creation event is sent to the server. 
+     * Action is taken if a "current" object is in focus, then a creation event for the new object is sent to the server. 
      */
     @Override
     public void mouseReleased(MouseEvent e) {
@@ -191,14 +187,11 @@ public class GUI extends JFrame implements
 	
 		template.draw(g);
 		
+		// Draws the GObjects from the EventHandler list
 		for (GObject obj : eh.getExistingGObjects()) {
 			obj.draw(g);
 		}
 	
-		//for(ListIterator<GObject> itr = objectList.listIterator(); itr.hasNext();) {
-		//	    itr.next().draw(g);
-		//}
-		
 		if(current != null) {
 		    current.draw(g);
 		}
@@ -210,6 +203,7 @@ public class GUI extends JFrame implements
 		update(bf.getGraphics());
 		g.drawImage(bf,0,0,null);
     }
+	
 	/**
 	 * Sets the ServerConnection for the client
 	 * @param serverConnection The class that manages connection to the Server
@@ -222,12 +216,14 @@ public class GUI extends JFrame implements
 	 * Add a GObject Shape to the GUI.
 	 * @param extraEh All received events inside a wrapper
 	 */
-	
 	public synchronized void addEvents(EventHandler extraEh) {
 		eh.addEvents(extraEh);
 		repaint();
 	}
 	
+	/**
+	 * Resets all GObjects Shapes in the GUI.
+	 */
 	public synchronized void removeEvents() {
 		eh = new EventHandler();
 		repaint();
