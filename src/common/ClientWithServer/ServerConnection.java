@@ -12,12 +12,24 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
+/**
+ * A handler for connecting and listening to events from the primary server
+ */
 public class ServerConnection {
+	// Keep track of the connection
     private Socket mSocket;
     private ThreadSafeObjectWriter mOutput;
     private ObjectInputStream mIStream;
+    // The EventReceiver to send received messages to
     private EventReceiver mEr;
 
+    /**
+     * Create a new server connection instance
+     * @param er The instance to send any received messages to
+     * @param serverAddress The address of the primary server
+     * @param serverPort The port of the primary server
+     * @throws IOException if the connection failed
+     */
     public ServerConnection(EventReceiver er, InetAddress serverAddress, int serverPort) throws IOException {
         mEr = er;
         mSocket = new Socket(serverAddress, serverPort);
@@ -26,19 +38,21 @@ public class ServerConnection {
     }
 
     
+    /**
+     * Keep the connection alive and listen for events
+     */
     public void run() {
-
-        System.out.println("Starting Pinger");
-
+        // Start pinger
         Pingu pingRunnable = new Pingu(mOutput);
         Thread pingThread = new Thread(pingRunnable);
         pingThread.start();
 
+        // Listen for server actions
         listenForServerActions();
 
-
         System.out.println("Connection Finished, stopping pinger and closing socket");
-
+        
+        // Stop pinger
         try {
         	pingRunnable.shutdown();
             pingThread.interrupt();
@@ -46,6 +60,7 @@ public class ServerConnection {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        
         try {
             mSocket.close();
         } catch (IOException e) {
@@ -54,8 +69,7 @@ public class ServerConnection {
 
     /**
      * Listens to the actions received from the server.
-     * 
-     * Begins waiting for and object
+     * Begins waiting for an object
      * If the object is an EvenHandler, add the object to the clients ArrayList
      * If the object is a pingMessage, print out the ping
      */
@@ -63,18 +77,21 @@ public class ServerConnection {
         System.out.println("Listening for server actions");
         while (true) {
             try {
+            	// Wait for object
                 Object input = mIStream.readObject();
                 if (input instanceof EventHandler) {
+                	// The object was an EventHandler, send to the receiver
                     EventHandler eh = (EventHandler) input;
                     mEr.addEvents(eh);
                 } else if (input instanceof PingMessage) {
                     System.out.print(".");
                 } else {
-                    System.err.println("Got some unknown shit from the server");
+                    System.err.println("Unknown message receieved from the server");
                 }
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                System.err.println("Unknown message receieved from the server");
             } catch (IOException e) {
+            	// The socket closed, exit
                 return;
             }
         }
@@ -88,7 +105,6 @@ public class ServerConnection {
         try {
             mOutput.writeObject(obj);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             System.err.println("Socket is closed. You're probably not connected yet...");
         }
     }

@@ -13,39 +13,53 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
+/**
+ * A helper class to let the server communicate with the frontend
+ */
 public class FrontEndCommunicator extends Thread {
+	// Connection information to the frontend
     private final String hostName;
     private final int hostPort;
-    private Server server;
-    private ObjectInputStream input;
+    
+    private final int serverPort; // Port for the server
+    
+    private ObjectInputStream input; 
+    
+    // The type of the server, if it is primary or backup
+    private Type type;
+    // If the server is a backup, keep track of the primary address and port
     private InetAddress primaryAddress;
     private int primaryPort;
-    private Type type;
 
     /**
-     * Connects and listens to frontend
+     * Creats a fec instance
+     * @param _serverPort for the server
+     * @param _hostName for the frontend
+     * @param _hostPort for the frontend
      */
-    public FrontEndCommunicator(Server _server, String _hostName, int _hostPort) {
-        server = _server;
+    public FrontEndCommunicator(int _serverPort, String _hostName, int _hostPort) {
+        serverPort = _serverPort;
         hostName = _hostName;
         hostPort = _hostPort;
     }
 
     /**
-     * Connects and listens to frontend
+     * Connects and listens to the frontend
      */
     public void run() {
         while (true) {
             try {
+            	// Try to connect to the frontend and send a server request message
                 System.out.println("Trying to send server request message");
                 Socket socket = new Socket(InetAddress.getByName(hostName), hostPort);
                 socket.setSoTimeout(5000);
                 input = new ObjectInputStream(socket.getInputStream());
                 ThreadSafeObjectWriter output = new ThreadSafeObjectWriter(new ObjectOutputStream(socket.getOutputStream()));
 
-                output.writeObject(new ConnectionRequestMessage(server.getPort(), type == Type.PRIMARY));
+                output.writeObject(new ConnectionRequestMessage(serverPort, type == Type.PRIMARY));
                 System.out.println("Sent server request message");
 
+                // Wait for a connection respond message, restart connection if any other message is received
                 Object obj = input.readObject();
                 if (obj instanceof ConnectionRespondMessage) {
                     ConnectionRespondMessage crm = (ConnectionRespondMessage) obj;
@@ -53,20 +67,25 @@ public class FrontEndCommunicator extends Thread {
                     primaryPort = crm.getPrimaryPort();
                     type = (crm.isPrimary() ? Type.PRIMARY : Type.BACKUP);
                     System.out.println("Frontend responded with a ConnectionRespondMessage");
-                }
+                    
+                    // The connection has been setup
+                    
+                    // Start the ping thread
+                    Pingu pingRunnable = new Pingu(output);
+                    Thread pingThread = new Thread(pingRunnable);
+                    pingThread.start();
 
-                Pingu pingRunnable = new Pingu(output);
-                Thread pingThread = new Thread(pingRunnable);
-                pingThread.start();
-
-                listenToFrontEnd();
-
-                try {
-                    pingRunnable.shutdown();
-                    pingThread.interrupt();
-                    pingThread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // Listen for messages
+                    listenToFrontEnd();
+                    
+                    // Stop the ping thread
+                    try {
+                        pingRunnable.shutdown();
+                        pingThread.interrupt();
+                        pingThread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 socket.close();
 
@@ -87,9 +106,12 @@ public class FrontEndCommunicator extends Thread {
     private void listenToFrontEnd() {
         while (true) {
             try {
+            	// Wait for objects
                 Object obj = input.readObject();
-
+                
+                // Object is received, try to parse it
                 if (obj instanceof isPrimaryMessage) {
+                	// The server has received a message telling it that it is a primary server
                     System.out.println("Backup server evolves into...... PRIMARY SERVER!!!");
                     type = Type.PRIMARY;
                 } else if (obj instanceof PingMessage) {
@@ -107,16 +129,22 @@ public class FrontEndCommunicator extends Thread {
     }
 
     /**
-     * Get which type of server it is
+     * Return the type of the server
      */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Returns the address of the primary server
+     */
     public InetAddress getPrimaryAddress() {
         return primaryAddress;
     }
 
+    /**
+     * Returns the port of the primary server
+     */
     public int getPrimaryPort() {
         return primaryPort;
     }
