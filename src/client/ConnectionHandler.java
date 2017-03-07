@@ -14,8 +14,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
- * A class that represents the CAD client side connection.
- * The ServerConnection should connect to a front end and ask for connection details to the primary server.
+ * A class that represents the Cad client side connection.
+ * The ConnectionHandler is responsible for connecting to the Front end,
+ * getting the connection details to the primary server and connect to that server.   
  */
 public class ConnectionHandler implements Runnable {
 
@@ -53,6 +54,7 @@ public class ConnectionHandler implements Runnable {
             getMainServerFromFrontend();
 
             try {
+            	// Initiate a ServerConnection with the obtained connection details and run it 
                 mSc = new ServerConnection(mGUI, mServerAddress, mServerPort);
                 mSc.run();
             } catch (IOException e) {
@@ -63,9 +65,9 @@ public class ConnectionHandler implements Runnable {
     }
 
     /**
-     * Attempts to the connect to the front end.
-     * When connected, attempts to receive connection details from the front end.
-     * Then, disconnects from the front end and connects to the specified primary server.
+     * Attempts to the connect to the front end. 
+     * When connected, attempts to get the connection details to the primary server. 
+     * When the connection details are obtained, the connection to the front end is disconnected and the method returns.  
      */
     private void getMainServerFromFrontend() {
        
