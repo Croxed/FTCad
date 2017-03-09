@@ -59,6 +59,12 @@ public class FrontEnd {
         }
     }
 
+    /**
+     * Remove a server from the connected servers.
+     * Also picks a new primary server if the removed one was the former
+     * primary server
+     * @param serverConnection ServerConnection to remove
+     */
     void removeServer(Connection serverConnection) {
         m_connectedServers.remove(serverConnection);
         if (m_PrimaryServer == serverConnection) {
@@ -73,6 +79,11 @@ public class FrontEnd {
         }
     }
 
+    /**
+     * Add a new server to the list of connected servers
+     * @param server Server to add
+     * @param wasPrimary Determines if
+     */
     public synchronized void addServer(Connection server, boolean wasPrimary) {
         m_connectedServers.add(server);
         if (m_PrimaryServer == null && wasPrimary) {
@@ -80,6 +91,10 @@ public class FrontEnd {
         }
     }
 
+    /**
+     * Get the primary server. If there's no primary server, pick one.
+     * @return the primary server
+     */
     Connection getPrimary() {
         if (m_PrimaryServer == null) {
             pickPrimary();
@@ -87,10 +102,17 @@ public class FrontEnd {
         return m_PrimaryServer;
     }
 
+    /**
+     * Pick a primary server if any server has connected to the FrontEnd.
+     */
     private void pickPrimary() {
         m_PrimaryServer = m_connectedServers.size() != 0 ? m_connectedServers.firstElement() : null;
     }
 
+    /**
+     * Wait 5 seconds on startup for all servers to connect
+     * This is to wait for former primary servers to connect to FrontEnd on crash.
+     */
     public void waitForAllowance() {
         if (m_time + 5000 > System.currentTimeMillis()) {
             try {

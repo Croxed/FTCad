@@ -3,7 +3,7 @@ package common.ClientWithFrontEnd;
 import common.Message;
 
 /**
- *Base class for request message
+ * Class for ConnectionRequests from Client to FrontEnd.
  */
 public class ConnectionRequestMessage extends Message {
     public ConnectionRequestMessage() {

@@ -20,6 +20,12 @@ public class Connection implements Runnable {
     private volatile int mPortNr;
     private volatile boolean isConnected;
 
+    /**
+     * Default constructor for Connection.
+     * Connection is a TCPConnection to a client or a server.
+     * @param frontEnd reference to the frontEnd
+     * @param socket socket to use
+     */
     public Connection(FrontEnd frontEnd, Socket socket) {
         m_frontEnd = frontEnd;
         m_socket = socket;
