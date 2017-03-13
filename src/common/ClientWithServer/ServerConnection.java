@@ -35,6 +35,8 @@ public class ServerConnection {
         mSocket = new Socket(serverAddress, serverPort);
         mOutput = new ThreadSafeObjectWriter(new ObjectOutputStream(mSocket.getOutputStream()));
         mIStream = new ObjectInputStream(mSocket.getInputStream());
+        mSocket.setSoTimeout(5000);
+
     }
 
     
@@ -77,7 +79,7 @@ public class ServerConnection {
         System.out.println("Listening for server actions");
         while (true) {
             try {
-            	// Wait for object
+                // Wait for object
                 Object input = mIStream.readObject();
                 if (input instanceof EventHandler) {
                 	// The object was an EventHandler, send to the receiver

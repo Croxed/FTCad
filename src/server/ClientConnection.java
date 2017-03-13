@@ -31,6 +31,7 @@ public class ClientConnection extends Thread {
     public ClientConnection(Server _server, Socket _socket) throws IOException {
         server = _server;
         socket = _socket;
+        socket.setSoTimeout(5000);
 
         input = new ObjectInputStream(socket.getInputStream());
         output = new ThreadSafeObjectWriter(new ObjectOutputStream(socket.getOutputStream()));
@@ -53,7 +54,6 @@ public class ClientConnection extends Thread {
         while (true) {
             try {
                 Object inData = input.readObject();
-
                 // A message has arrived, try to parse and handle it
                 if (inData instanceof PingMessage) {
                     System.out.print(".");
@@ -96,7 +96,7 @@ public class ClientConnection extends Thread {
         try {
             output.writeObject(o);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Could not send object");
         }
     }
 }
